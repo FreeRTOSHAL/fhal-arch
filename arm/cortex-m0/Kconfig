@@ -1,0 +1,10 @@
+comment "Cortex-M0 Settings"
+config ARCH_INCLUDE
+	string 
+	default "-Iarch/arm/cortex-m0 -Iarch/arm/include"
+config ARCH_CFLAGS
+	string
+	default "-mthumb -mcpu=cortex-m0"
+config ARCH_LDFLAGS
+	string
+	default ""

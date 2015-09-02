@@ -1,0 +1,25 @@
+choice
+	depends on ARCH_ARM
+	prompt "Select Core Type"
+	config ARCH_ARM_CORTEX_M0
+		bool "ARM Cortex-M0"
+		help
+			ARM Cortex-M0
+	config ARCH_ARM_CORTEX_M3
+		bool "ARM Cortex-M3"
+		help
+			ARM Cortex-M3
+	config ARCH_ARM_CORTEX_M4
+		bool "ARM Cortex-M4"
+		help
+			ARM Cortex-M4
+endchoice
+if ARCH_ARM_CORTEX_M0=y
+source arch/arm/cortex-m0/Kconfig
+endif
+if ARCH_ARM_CORTEX_M3=y
+source arch/arm/cortex-m3/Kconfig
+endif
+if ARCH_ARM_CORTEX_M4=y
+source arch/arm/cortex-m4/Kconfig
+endif

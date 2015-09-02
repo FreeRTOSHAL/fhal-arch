@@ -1,0 +1,21 @@
+menu "Architecture Settings"
+choice
+	prompt "Select Architecture"
+	config ARCH_ARM
+		bool "ARM"
+		help
+			ARM Based Architecture
+endchoice
+comment "Global Settings"
+comment "Waring CPU Clock Hz not set!"
+	depends on CPU_CLOCK_HZ=0
+config CPU_CLOCK_HZ
+	int "CPU Clock Speed(Hz)"
+	default 0
+	help
+		CPU Clock Speed in Hz
+comment "Architecture Settings"
+if ARCH_ARM=y
+source arch/arm/Kconfig
+endif
+endmenu

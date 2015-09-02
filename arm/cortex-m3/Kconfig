@@ -1,0 +1,13 @@
+comment "Cortex-M3 Settings"
+config ARCH_INCLUDE
+	string 
+	default "-Iarch/arm/cortex-m3 -Iarch/arm/include"
+config ARCH_CFLAGS
+	string
+	default "-mthumb -mcpu=cortex-m3"
+config ARCH_LDFLAGS
+	string
+	default ""
+config PORT_HAS_OPTIMISED_TASK_SELECTION
+	bool
+	default y
