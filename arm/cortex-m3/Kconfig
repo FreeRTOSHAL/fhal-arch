@@ -5,9 +5,15 @@ config ARCH_INCLUDE
 config ARCH_CFLAGS
 	string
 	default "-mthumb -mcpu=cortex-m3"
+config ARCH_AFLAGS
+	string
+	default "-mthumb -mcpu=cortex-m3"
 config ARCH_LDFLAGS
 	string
 	default ""
 config PORT_HAS_OPTIMISED_TASK_SELECTION
+	bool
+	default y
+config ARCH_HAS_TICKLESS_SUPPORT
 	bool
 	default y

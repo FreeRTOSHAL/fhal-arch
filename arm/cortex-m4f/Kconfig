@@ -1,7 +1,7 @@
 comment "Cortex-M4 Settings"
 config ARCH_INCLUDE
 	string 
-	default "-Iarch/arm/cortex-m4 -Iarch/arm/include"
+	default "-Iarch/arm/cortex-m4f -Iarch/arm/include"
 config ARCH_CFLAGS
 	string
 	default "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard"
@@ -11,6 +11,9 @@ config ARCH_AFLAGS
 config ARCH_LDFLAGS
 	string
 	default ""
-config PORT_HAS_OPTIMISED_TASK_SELECTION
+config ARCH_HAS_OPTIMISED_TASK_SELECTION
+	bool
+	default y
+config ARCH_HAS_TICKLESS_SUPPORT
 	bool
 	default y
