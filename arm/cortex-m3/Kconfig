@@ -11,7 +11,7 @@ config ARCH_AFLAGS
 config ARCH_LDFLAGS
 	string
 	default ""
-config PORT_HAS_OPTIMISED_TASK_SELECTION
+config ARCH_HAS_OPTIMISED_TASK_SELECTION
 	bool
 	default y
 config ARCH_HAS_TICKLESS_SUPPORT
