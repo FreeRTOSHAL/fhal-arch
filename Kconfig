@@ -5,6 +5,10 @@ choice
 		bool "ARM"
 		help
 			ARM Based Architecture
+	config ARCH_X86
+		bool "X86"
+		help
+			X86 Based Architecture
 endchoice
 comment "Global Settings"
 comment "Waring CPU Clock Hz not set!"
@@ -12,10 +16,14 @@ comment "Waring CPU Clock Hz not set!"
 config CPU_CLOCK_HZ
 	int "CPU Clock Speed(Hz)"
 	default 0
+	depends on !ARCH_X86
 	help
 		CPU Clock Speed in Hz
 comment "Architecture Settings"
 if ARCH_ARM=y
 source arch/arm/Kconfig
+endif
+if ARCH_X86=y
+source arch/x86/Kconfig
 endif
 endmenu

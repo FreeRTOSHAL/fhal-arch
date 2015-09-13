@@ -1,0 +1,11 @@
+choice
+	depends on ARCH_X86
+	prompt "Select Core Type"
+	config ARCH_X86_LINUX
+		bool "X86 Linux Emulator"
+		help
+			X86 Linux Emulator
+endchoice
+if ARCH_X86_LINUX
+source arch/x86/linux/Kconfig
+endif
