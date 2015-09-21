@@ -113,7 +113,17 @@ typedef unsigned long UBaseType_t;
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH			( -1 )
-#define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / CONFIG_TICK_RATE_HZ )
+#if CONFIG_TICK_RATE_HZ > 1000
+# define portTICK_PERIOD_MS			1 * ( ( TickType_t ) CONFIG_TICK_RATE_HZ / 1000 )
+#else
+# define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / CONFIG_TICK_RATE_HZ )
+#endif
+#if CONFIG_TICK_RATE_HZ > 1000
+#define portTICK_PERIOD_US                      1 + ((TickType_t) CONFIG_TICK_RATE_HZ / 1000000)
+#else
+#define portTICK_PERIOD_US			TICK_PERIOD_US_NOT_SUPPORED
+#endif
+
 #define portBYTE_ALIGNMENT			8
 /*-----------------------------------------------------------*/
 
