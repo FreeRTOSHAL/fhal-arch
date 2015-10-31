@@ -4,7 +4,10 @@ config ARCH_INCLUDE
 	default "-Iarch/arm/cortex-m0 -Iarch/arm/include"
 config ARCH_CFLAGS
 	string
-	default "-mthumb -mcpu=cortex-m0"
+	default "-mthumb -mcpu=cortex-m0 -march=armv6-m -mtune=cortex-m0"
+config ARCH_AFLAGS
+	string
+	default "-mthumb -mcpu=cortex-m0 -march=armv6-m -mtune=cortex-m0"
 config ARCH_LDFLAGS
 	string
 	default ""
