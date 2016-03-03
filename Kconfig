@@ -13,10 +13,23 @@ endchoice
 comment "Global Settings"
 comment "Waring CPU Clock Hz not set!"
 	depends on CPU_CLOCK_HZ=0
+choice	
+	prompt "Select CPU Clock Speed Source"
+	config CPU_CLOCK_BY_DEFINE
+		bool "CPU Clock Speed over Define"
+		depends on !ARCH_X86
+		help
+			CPU Clock Speed is defined by Define s. CONFIG_CPU_CLOCK_HZ
+	config CPU_CLOCK_BY_INTERFACE
+		bool "CPU Clock Speed over Clock Interface"
+		depends on !ARCH_X86
+		help
+			CPU Clock Speed is defined by Clock Interface over Function clock_getCPUSpeed
+endchoice
 config CPU_CLOCK_HZ
 	int "CPU Clock Speed(Hz)"
 	default 0
-	depends on !ARCH_X86
+	depends on !ARCH_X86 && CPU_CLOCK_BY_DEFINE
 	help
 		CPU Clock Speed in Hz
 comment "Architecture Settings"
