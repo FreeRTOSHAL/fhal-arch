@@ -38,7 +38,7 @@
 
     http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
     the FAQ page "My application does not run, what could be wrong?".  Have you
-    defined CONFIG_ASSERT()?
+    defined configASSERT()?
 
     http://www.FreeRTOS.org/support - In return for receiving this top quality
     embedded software for free we request you assist our global community by
@@ -76,11 +76,11 @@
 #include "task.h"
 
 #ifndef __VFP_FP__
-	#error This port can only be used when the project options are CONFIG_ured to enable hardware floating point support.
+	#error This port can only be used when the project options are configured to enable hardware floating point support.
 #endif
 
-#ifndef CONFIG_SYSTICK_CLOCK_HZ
-	#define CONFIG_SYSTICK_CLOCK_HZ CONFIG_CPU_CLOCK_HZ
+#ifndef configSYSTICK_CLOCK_HZ
+	#define configSYSTICK_CLOCK_HZ configCPU_CLOCK_HZ
 	/* Ensure the SysTick is clocked at the same frequency as the core. */
 	#define portNVIC_SYSTICK_CLK_BIT	( 1UL << 2UL )
 #else
@@ -107,8 +107,8 @@ r0p1 port. */
 #define portCORTEX_M7_r0p1_ID				( 0x410FC271UL )
 #define portCORTEX_M7_r0p0_ID				( 0x410FC270UL )
 
-#define portNVIC_PENDSV_PRI					( ( ( uint32_t ) CONFIG_KERNEL_INTERRUPT_PRIORITY ) << 16UL )
-#define portNVIC_SYSTICK_PRI				( ( ( uint32_t ) CONFIG_KERNEL_INTERRUPT_PRIORITY ) << 24UL )
+#define portNVIC_PENDSV_PRI					( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 16UL )
+#define portNVIC_SYSTICK_PRI				( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 24UL )
 
 /* Constants required to check the validity of an interrupt priority. */
 #define portFIRST_USER_INTERRUPT_NUMBER		( 16 )
@@ -142,8 +142,8 @@ calculations. */
 /* Let the user override the pre-loading of the initial LR with the address of
 prvTaskExitError() in case it messes up unwinding of the stack in the
 debugger. */
-#ifdef CONFIG_TASK_RETURN_ADDRESS
-	#define portTASK_RETURN_ADDRESS	CONFIG_TASK_RETURN_ADDRESS
+#ifdef configTASK_RETURN_ADDRESS
+	#define portTASK_RETURN_ADDRESS	configTASK_RETURN_ADDRESS
 #else
 	#define portTASK_RETURN_ADDRESS	prvTaskExitError
 #endif
@@ -186,36 +186,36 @@ static void prvTaskExitError( void );
 /*
  * The number of SysTick increments that make up one tick period.
  */
-#if CONFIG_USE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 1
 	static uint32_t ulTimerCountsForOneTick = 0;
-#endif /* CONFIG_USE_TICKLESS_IDLE */
+#endif /* configUSE_TICKLESS_IDLE */
 
 /*
  * The maximum number of tick periods that can be suppressed is limited by the
  * 24 bit resolution of the SysTick timer.
  */
-#if CONFIG_USE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 1
 	static uint32_t xMaximumPossibleSuppressedTicks = 0;
-#endif /* CONFIG_USE_TICKLESS_IDLE */
+#endif /* configUSE_TICKLESS_IDLE */
 
 /*
  * Compensate for the CPU cycles that pass while the SysTick is stopped (low
  * power functionality only.
  */
-#if CONFIG_USE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 1
 	static uint32_t ulStoppedTimerCompensation = 0;
-#endif /* CONFIG_USE_TICKLESS_IDLE */
+#endif /* configUSE_TICKLESS_IDLE */
 
 /*
  * Used by the portASSERT_IF_INTERRUPT_PRIORITY_INVALID() macro to ensure
  * FreeRTOS API functions are not called from interrupts that have been assigned
- * a priority above CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY.
+ * a priority above configMAX_SYSCALL_INTERRUPT_PRIORITY.
  */
-#if ( CONFIG_ASSERT_DEFINED == 1 )
+#if ( configASSERT_DEFINED == 1 )
 	 static uint8_t ucMaxSysCallPriority = 0;
 	 static uint32_t ulMaxPRIGROUPValue = 0;
 	 static const volatile uint8_t * const pcInterruptPriorityRegisters = ( const volatile uint8_t * const ) portNVIC_IP_REGISTERS_OFFSET_16;
-#endif /* CONFIG_ASSERT_DEFINED */
+#endif /* configASSERT_DEFINED */
 
 /*-----------------------------------------------------------*/
 
@@ -258,9 +258,9 @@ static void prvTaskExitError( void )
 	its caller as there is nothing to return to.  If a task wants to exit it
 	should instead call vTaskDelete( NULL ).
 
-	Artificially force an assert() to be triggered if CONFIG_ASSERT() is
+	Artificially force an assert() to be triggered if configASSERT() is
 	defined, then stop here so application writers can catch the error. */
-	CONFIG_ASSERT( uxCriticalNesting == ~0UL );
+	configASSERT( uxCriticalNesting == ~0UL );
 	portDISABLE_INTERRUPTS();
 	for( ;; );
 }
@@ -307,17 +307,17 @@ static void prvPortStartFirstTask( void )
  */
 BaseType_t xPortStartScheduler( void )
 {
-	/* CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY must not be set to 0.
+	/* configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to 0.
 	See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
-	CONFIG_ASSERT( CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY );
+	configASSERT( configMAX_SYSCALL_INTERRUPT_PRIORITY );
 
 	/* This port can be used on all revisions of the Cortex-M7 core other than
 	the r0p1 parts.  r0p1 parts should use the port from the
 	/source/portable/GCC/ARM_CM7/r0p1 directory. */
-	CONFIG_ASSERT( portCPUID != portCORTEX_M7_r0p1_ID );
-	CONFIG_ASSERT( portCPUID != portCORTEX_M7_r0p0_ID );
+	configASSERT( portCPUID != portCORTEX_M7_r0p1_ID );
+	configASSERT( portCPUID != portCORTEX_M7_r0p0_ID );
 
-	#if( CONFIG_ASSERT_DEFINED == 1 )
+	#if( configASSERT_DEFINED == 1 )
 	{
 		volatile uint32_t ulOriginalPriority;
 		volatile uint8_t * const pucFirstUserPriorityRegister = ( volatile uint8_t * const ) ( portNVIC_IP_REGISTERS_OFFSET_16 + portFIRST_USER_INTERRUPT_NUMBER );
@@ -339,7 +339,7 @@ BaseType_t xPortStartScheduler( void )
 		ucMaxPriorityValue = *pucFirstUserPriorityRegister;
 
 		/* Use the same mask on the maximum system call priority. */
-		ucMaxSysCallPriority = CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY & ucMaxPriorityValue;
+		ucMaxSysCallPriority = configMAX_SYSCALL_INTERRUPT_PRIORITY & ucMaxPriorityValue;
 
 		/* Calculate the maximum acceptable priority group value for the number
 		of bits read back. */
@@ -384,7 +384,7 @@ BaseType_t xPortStartScheduler( void )
 	/* Should never get here as the tasks will now be executing!  Call the task
 	exit error function to prevent compiler warnings about a static function
 	not being called in the case that the application writer overrides this
-	functionality by defining CONFIG_TASK_RETURN_ADDRESS. */
+	functionality by defining configTASK_RETURN_ADDRESS. */
 	prvTaskExitError();
 
 	/* Should not get here! */
@@ -396,7 +396,7 @@ void vPortEndScheduler( void )
 {
 	/* Not implemented in ports where there is nothing to return to.
 	Artificially force an assert. */
-	CONFIG_ASSERT( uxCriticalNesting == 1000UL );
+	configASSERT( uxCriticalNesting == 1000UL );
 }
 /*-----------------------------------------------------------*/
 
@@ -412,14 +412,14 @@ void vPortEnterCritical( void )
 	assert function also uses a critical section. */
 	if( uxCriticalNesting == 1 )
 	{
-		CONFIG_ASSERT( ( portNVIC_INT_CTRL_REG & portVECTACTIVE_MASK ) == 0 );
+		configASSERT( ( portNVIC_INT_CTRL_REG & portVECTACTIVE_MASK ) == 0 );
 	}
 }
 /*-----------------------------------------------------------*/
 
 void vPortExitCritical( void )
 {
-	CONFIG_ASSERT( uxCriticalNesting );
+	configASSERT( uxCriticalNesting );
 	uxCriticalNesting--;
 	if( uxCriticalNesting == 0 )
 	{
@@ -481,7 +481,7 @@ void xPortPendSVHandler( void )
 	"										\n"
 	"	.align 2							\n"
 	"pxCurrentTCBConst: .word pxCurrentTCB	\n"
-	::"i"(CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY)
+	::"i"(configMAX_SYSCALL_INTERRUPT_PRIORITY)
 	);
 }
 /*-----------------------------------------------------------*/
@@ -506,7 +506,7 @@ void xPortSysTickHandler( void )
 }
 /*-----------------------------------------------------------*/
 
-#if CONFIG_USE_TICKLESS_IDLE == 1
+#if configUSE_TICKLESS_IDLE == 1
 
 	__attribute__((weak)) void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
 	{
@@ -569,20 +569,20 @@ void xPortSysTickHandler( void )
 			/* Restart SysTick. */
 			portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
 
-			/* Sleep until something happens.  CONFIG_PRE_SLEEP_PROCESSING() can
+			/* Sleep until something happens.  configPRE_SLEEP_PROCESSING() can
 			set its parameter to 0 to indicate that its implementation contains
 			its own wait for interrupt or wait for event instruction, and so wfi
 			should not be executed again.  However, the original expected idle
 			time variable must remain unmodified, so a copy is taken. */
 			xModifiableIdleTime = xExpectedIdleTime;
-			CONFIG_PRE_SLEEP_PROCESSING( xModifiableIdleTime );
+			configPRE_SLEEP_PROCESSING( xModifiableIdleTime );
 			if( xModifiableIdleTime > 0 )
 			{
 				__asm volatile( "dsb" );
 				__asm volatile( "wfi" );
 				__asm volatile( "isb" );
 			}
-			CONFIG_POST_SLEEP_PROCESSING( xExpectedIdleTime );
+			configPOST_SLEEP_PROCESSING( xExpectedIdleTime );
 
 			/* Stop SysTick.  Again, the time the SysTick is stopped for is
 			accounted for as best it can be, but using the tickless mode will
@@ -655,7 +655,7 @@ void xPortSysTickHandler( void )
 		}
 	}
 
-#endif /* #if CONFIG_USE_TICKLESS_IDLE */
+#endif /* #if configUSE_TICKLESS_IDLE */
 /*-----------------------------------------------------------*/
 
 /*
@@ -664,17 +664,17 @@ void xPortSysTickHandler( void )
  */
 __attribute__(( weak )) void vPortSetupTimerInterrupt( void )
 {
-	/* Calculate the constants required to CONFIG_ure the tick interrupt. */
-	#if CONFIG_USE_TICKLESS_IDLE == 1
+	/* Calculate the constants required to configure the tick interrupt. */
+	#if configUSE_TICKLESS_IDLE == 1
 	{
-		ulTimerCountsForOneTick = ( CONFIG_SYSTICK_CLOCK_HZ / CONFIG_TICK_RATE_HZ );
+		ulTimerCountsForOneTick = ( configSYSTICK_CLOCK_HZ / configTICK_RATE_HZ );
 		xMaximumPossibleSuppressedTicks = portMAX_24_BIT_NUMBER / ulTimerCountsForOneTick;
-		ulStoppedTimerCompensation = portMISSED_COUNTS_FACTOR / ( CONFIG_CPU_CLOCK_HZ / CONFIG_SYSTICK_CLOCK_HZ );
+		ulStoppedTimerCompensation = portMISSED_COUNTS_FACTOR / ( configCPU_CLOCK_HZ / configSYSTICK_CLOCK_HZ );
 	}
-	#endif /* CONFIG_USE_TICKLESS_IDLE */
+	#endif /* configUSE_TICKLESS_IDLE */
 
 	/* Configure SysTick to interrupt at the requested rate. */
-	portNVIC_SYSTICK_LOAD_REG = ( CONFIG_SYSTICK_CLOCK_HZ / CONFIG_TICK_RATE_HZ ) - 1UL;
+	portNVIC_SYSTICK_LOAD_REG = ( configSYSTICK_CLOCK_HZ / configTICK_RATE_HZ ) - 1UL;
 	portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT | portNVIC_SYSTICK_INT_BIT | portNVIC_SYSTICK_ENABLE_BIT );
 }
 /*-----------------------------------------------------------*/
@@ -694,7 +694,7 @@ static void vPortEnableVFP( void )
 }
 /*-----------------------------------------------------------*/
 
-#if( CONFIG_ASSERT_DEFINED == 1 )
+#if( configASSERT_DEFINED == 1 )
 
 	void vPortValidateInterruptPriority( void )
 	{
@@ -712,19 +712,19 @@ static void vPortEnableVFP( void )
 
 			/* The following assertion will fail if a service routine (ISR) for
 			an interrupt that has been assigned a priority above
-			CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY calls an ISR safe FreeRTOS API
+			configMAX_SYSCALL_INTERRUPT_PRIORITY calls an ISR safe FreeRTOS API
 			function.  ISR safe FreeRTOS API functions must *only* be called
 			from interrupts that have been assigned a priority at or below
-			CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY.
+			configMAX_SYSCALL_INTERRUPT_PRIORITY.
 
 			Numerically low interrupt priority numbers represent logically high
 			interrupt priorities, therefore the priority of the interrupt must
 			be set to a value equal to or numerically *higher* than
-			CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY.
+			configMAX_SYSCALL_INTERRUPT_PRIORITY.
 
 			Interrupts that	use the FreeRTOS API must not be left at their
 			default priority of	zero as that is the highest possible priority,
-			which is guaranteed to be above CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY,
+			which is guaranteed to be above configMAX_SYSCALL_INTERRUPT_PRIORITY,
 			and	therefore also guaranteed to be invalid.
 
 			FreeRTOS maintains separate thread and ISR API functions to ensure
@@ -733,7 +733,7 @@ static void vPortEnableVFP( void )
 			The following links provide detailed information:
 			http://www.freertos.org/RTOS-Cortex-M3-M4.html
 			http://www.freertos.org/FAQHelp.html */
-			CONFIG_ASSERT( ucCurrentPriority >= ucMaxSysCallPriority );
+			configASSERT( ucCurrentPriority >= ucMaxSysCallPriority );
 		}
 
 		/* Priority grouping:  The interrupt controller (NVIC) allows the bits
@@ -744,14 +744,14 @@ static void vPortEnableVFP( void )
 		this is not the case (if some bits represent a sub-priority).
 
 		If the application only uses CMSIS libraries for interrupt
-		CONFIG_uration then the correct setting can be achieved on all Cortex-M
+		configuration then the correct setting can be achieved on all Cortex-M
 		devices by calling NVIC_SetPriorityGrouping( 0 ); before starting the
 		scheduler.  Note however that some vendor specific peripheral libraries
 		assume a non-zero priority group setting, in which cases using a value
 		of zero will result in unpredicable behaviour. */
-		CONFIG_ASSERT( ( portAIRCR_REG & portPRIORITY_GROUP_MASK ) <= ulMaxPRIGROUPValue );
+		configASSERT( ( portAIRCR_REG & portPRIORITY_GROUP_MASK ) <= ulMaxPRIGROUPValue );
 	}
 
-#endif /* CONFIG_ASSERT_DEFINED */
+#endif /* configASSERT_DEFINED */
 
 

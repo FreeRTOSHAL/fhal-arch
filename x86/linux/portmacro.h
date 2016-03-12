@@ -36,7 +36,7 @@
 
 	1 tab == 4 spaces!
 
-	Please ensure to read the CONFIG_uration and relevant port sections of the
+	Please ensure to read the configuration and relevant port sections of the
 	online documentation.
 
 	http://www.FreeRTOS.org - Documentation, latest information, license and
@@ -60,7 +60,7 @@ extern "C" {
 /*-----------------------------------------------------------
  * Port specific definitions.
  *
- * The settings in this file CONFIG_ure FreeRTOS correctly for the
+ * The settings in this file configure FreeRTOS correctly for the
  * given hardware and compiler.
  *
  * These settings should not be altered.
@@ -80,7 +80,7 @@ typedef portSTACK_TYPE StackType_t;
 typedef long BaseType_t;
 typedef unsigned long UBaseType_t;
 
-#if( CONFIG_USE_16_BIT_TICKS == 1 )
+#if( configUSE_16_BIT_TICKS == 1 )
 	typedef unsigned portSHORT TickType_t;
 	#define portMAX_DELAY ( TickType_t ) 0xffff
 #else
@@ -91,9 +91,9 @@ typedef unsigned long UBaseType_t;
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH				( -1 )
-/*#define portTICK_RATE_MS				( ( portTickType ) 1000 / CONFIG_TICK_RATE_HZ )*/
-#define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / CONFIG_TICK_RATE_HZ )
-#define portTICK_RATE_MICROSECONDS		( ( portTickType ) 1000000 / CONFIG_TICK_RATE_HZ )
+/*#define portTICK_RATE_MS				( ( portTickType ) 1000 / configTICK_RATE_HZ )*/
+#define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / configTICK_RATE_HZ )
+#define portTICK_RATE_MICROSECONDS		( ( portTickType ) 1000000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT				4
 #define portREMOVE_STATIC_QUALIFIER
 /*-----------------------------------------------------------*/

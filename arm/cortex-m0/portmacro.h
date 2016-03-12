@@ -38,7 +38,7 @@
 
     http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
     the FAQ page "My application does not run, what could be wrong?".  Have you
-    defined CONFIG_ASSERT()?
+    defined configASSERT()?
 
     http://www.FreeRTOS.org/support - In return for receiving this top quality
     embedded software for free we request you assist our global community by
@@ -78,7 +78,7 @@ extern "C" {
 /*-----------------------------------------------------------
  * Port specific definitions.
  *
- * The settings in this file CONFIG_ure FreeRTOS correctly for the
+ * The settings in this file configure FreeRTOS correctly for the
  * given hardware and compiler.
  *
  * These settings should not be altered.
@@ -98,7 +98,7 @@ typedef portSTACK_TYPE StackType_t;
 typedef long BaseType_t;
 typedef unsigned long UBaseType_t;
 
-#if( CONFIG_USE_16_BIT_TICKS == 1 )
+#if( configUSE_16_BIT_TICKS == 1 )
 	typedef uint16_t TickType_t;
 	#define portMAX_DELAY ( TickType_t ) 0xffff
 #else
@@ -113,13 +113,13 @@ typedef unsigned long UBaseType_t;
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH			( -1 )
-#if CONFIG_TICK_RATE_HZ > 1000
-# define portTICK_PERIOD_MS                    1 * ( ( TickType_t ) CONFIG_TICK_RATE_HZ / 1000 )
+#if configTICK_RATE_HZ > 1000
+# define portTICK_PERIOD_MS                    1 * ( ( TickType_t ) configTICK_RATE_HZ / 1000 )
 #else
-# define portTICK_PERIOD_MS                    ( ( TickType_t ) 1000 / CONFIG_TICK_RATE_HZ )
+# define portTICK_PERIOD_MS                    ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #endif
 #if CONFIG_TICK_RATE_HZ > 1000
-# define portTICK_PERIOD_US                      1 + ((TickType_t) CONFIG_TICK_RATE_HZ / 1000000)
+# define portTICK_PERIOD_US                      1 + ((TickType_t) configTICK_RATE_HZ / 1000000)
 #else
 # define portTICK_PERIOD_US                     TICK_PERIOD_US_NOT_SUPPORED
 #endif

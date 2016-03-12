@@ -38,7 +38,7 @@
 
     http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
     the FAQ page "My application does not run, what could be wrong?".  Have you
-    defined CONFIG_ASSERT()?
+    defined configASSERT()?
 
     http://www.FreeRTOS.org/support - In return for receiving this top quality
     embedded software for free we request you assist our global community by
@@ -78,7 +78,7 @@ extern "C" {
 /*-----------------------------------------------------------
  * Port specific definitions.
  *
- * The settings in this file CONFIG_ure FreeRTOS correctly for the
+ * The settings in this file configure FreeRTOS correctly for the
  * given hardware and compiler.
  *
  * These settings should not be altered.
@@ -98,7 +98,7 @@ typedef portSTACK_TYPE StackType_t;
 typedef long BaseType_t;
 typedef unsigned long UBaseType_t;
 
-#if( CONFIG_USE_16_BIT_TICKS == 1 )
+#if( configUSE_16_BIT_TICKS == 1 )
 	typedef uint16_t TickType_t;
 	#define portMAX_DELAY ( TickType_t ) 0xffff
 #else
@@ -113,13 +113,13 @@ typedef unsigned long UBaseType_t;
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH			( -1 )
-#if CONFIG_TICK_RATE_HZ > 1000
-# define portTICK_PERIOD_MS                    1 * ( ( TickType_t ) CONFIG_TICK_RATE_HZ / 1000 )
+#if configTICK_RATE_HZ > 1000
+# define portTICK_PERIOD_MS                    1 * ( ( TickType_t ) configTICK_RATE_HZ / 1000 )
 #else
-# define portTICK_PERIOD_MS                    ( ( TickType_t ) 1000 / CONFIG_TICK_RATE_HZ )
+# define portTICK_PERIOD_MS                    ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #endif
-#if CONFIG_TICK_RATE_HZ > 1000
-# define portTICK_PERIOD_US                      1 + ((TickType_t) CONFIG_TICK_RATE_HZ / 1000000)
+#if configTICK_RATE_HZ > 1000
+# define portTICK_PERIOD_US                      1 + ((TickType_t) configTICK_RATE_HZ / 1000000)
 #else
 # define portTICK_PERIOD_US                     TICK_PERIOD_US_NOT_SUPPORED
 #endif
@@ -171,11 +171,11 @@ not necessary for to use this port.  They are defined so the common demo files
 /*-----------------------------------------------------------*/
 
 /* Architecture specific optimisations. */
-#ifndef CONFIG_USE_PORT_OPTIMISED_TASK_SELECTION
-	#define CONFIG_USE_PORT_OPTIMISED_TASK_SELECTION 1
+#ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
+	#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 #endif
 
-#if CONFIG_USE_PORT_OPTIMISED_TASK_SELECTION == 1
+#if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
 
 	/* Generic helper function. */
 	__attribute__( ( always_inline ) ) static inline uint8_t ucPortCountLeadingZeros( uint32_t ulBitmap )
@@ -186,9 +186,9 @@ not necessary for to use this port.  They are defined so the common demo files
 		return ucReturn;
 	}
 
-	/* Check the CONFIG_uration. */
-	#if( CONFIG_MAX_PRIORITIES > 32 )
-		#error CONFIG_USE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when CONFIG_MAX_PRIORITIES is less than or equal to 32.  It is very rare that a system requires more than 10 to 15 difference priorities as tasks that share a priority will time slice.
+	/* Check the configuration. */
+	#if( configMAX_PRIORITIES > 32 )
+		#error configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is less than or equal to 32.  It is very rare that a system requires more than 10 to 15 difference priorities as tasks that share a priority will time slice.
 	#endif
 
 	/* Store/clear the ready priorities in a bit map. */
@@ -199,11 +199,11 @@ not necessary for to use this port.  They are defined so the common demo files
 
 	#define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities ) uxTopPriority = ( 31 - ucPortCountLeadingZeros( ( uxReadyPriorities ) ) )
 
-#endif /* CONFIG_USE_PORT_OPTIMISED_TASK_SELECTION */
+#endif /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
 
 /*-----------------------------------------------------------*/
 
-#ifdef CONFIG_ASSERT
+#ifdef configASSERT
 	void vPortValidateInterruptPriority( void );
 	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() 	vPortValidateInterruptPriority()
 #endif
@@ -227,7 +227,7 @@ uint32_t ulNewBASEPRI;
 		"	msr basepri, %0											\n" \
 		"	isb														\n" \
 		"	dsb														\n" \
-		:"=r" (ulNewBASEPRI) : "i" ( CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY )
+		:"=r" (ulNewBASEPRI) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY )
 	);
 }
 
@@ -244,7 +244,7 @@ uint32_t ulOriginalBASEPRI, ulNewBASEPRI;
 		"	msr basepri, %1											\n" \
 		"	isb														\n" \
 		"	dsb														\n" \
-		:"=r" (ulOriginalBASEPRI), "=r" (ulNewBASEPRI) : "i" ( CONFIG_MAX_SYSCALL_INTERRUPT_PRIORITY )
+		:"=r" (ulOriginalBASEPRI), "=r" (ulNewBASEPRI) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY )
 	);
 
 	/* This return will not be reached but is necessary to prevent compiler

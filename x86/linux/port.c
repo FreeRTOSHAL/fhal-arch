@@ -37,7 +37,7 @@
 
 	1 tab == 4 spaces!
 
-	Please ensure to read the CONFIG_uration and relevant port sections of the
+	Please ensure to read the configuration and relevant port sections of the
 	online documentation.
 
 	http://www.FreeRTOS.org - Documentation, latest information, license and
@@ -412,7 +412,7 @@ pthread_t xTaskToResume;
 			xTaskIncrementTick();
 
 			/* Select Next Task. */
-#if ( CONFIG_USE_PREEMPTION == 1 )
+#if ( configUSE_PREEMPTION == 1 )
 			vTaskSwitchContext();
 #endif
 			xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
@@ -592,7 +592,7 @@ portBASE_TYPE xResult;
 
 void prvSetupSignalsAndSchedulerPolicy( void )
 {
-/* The following code would allow for CONFIG_uring the scheduling of this task as a Real-time task.
+/* The following code would allow for configuring the scheduling of this task as a Real-time task.
  * The process would then need to be run with higher privileges for it to take affect.
 int iPolicy;
 int iResult;

@@ -38,7 +38,7 @@
 
     http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
     the FAQ page "My application does not run, what could be wrong?".  Have you
-    defined CONFIG_ASSERT()?
+    defined configASSERT()?
 
     http://www.FreeRTOS.org/support - In return for receiving this top quality
     embedded software for free we request you assist our global community by
@@ -94,8 +94,8 @@
 /* Let the user override the pre-loading of the initial LR with the address of
 prvTaskExitError() in case it messes up unwinding of the stack in the
 debugger. */
-#ifdef CONFIG_TASK_RETURN_ADDRESS
-	#define portTASK_RETURN_ADDRESS	CONFIG_TASK_RETURN_ADDRESS
+#ifdef configTASK_RETURN_ADDRESS
+	#define portTASK_RETURN_ADDRESS	configTASK_RETURN_ADDRESS
 #else
 	#define portTASK_RETURN_ADDRESS	prvTaskExitError
 #endif
@@ -155,9 +155,9 @@ static void prvTaskExitError( void )
 	its caller as there is nothing to return to.  If a task wants to exit it
 	should instead call vTaskDelete( NULL ).
 
-	Artificially force an assert() to be triggered if CONFIG_ASSERT() is
+	Artificially force an assert() to be triggered if configASSERT() is
 	defined, then stop here so application writers can catch the error. */
-	CONFIG_ASSERT( uxCriticalNesting == ~0UL );
+	configASSERT( uxCriticalNesting == ~0UL );
 	portDISABLE_INTERRUPTS();
 	for( ;; );
 }
@@ -216,7 +216,7 @@ BaseType_t xPortStartScheduler( void )
 	/* Should never get here as the tasks will now be executing!  Call the task
 	exit error function to prevent compiler warnings about a static function
 	not being called in the case that the application writer overrides this
-	functionality by defining CONFIG_TASK_RETURN_ADDRESS. */
+	functionality by defining configTASK_RETURN_ADDRESS. */
 	prvTaskExitError();
 
 	/* Should not get here! */
@@ -228,7 +228,7 @@ void vPortEndScheduler( void )
 {
 	/* Not implemented in ports where there is nothing to return to.
 	Artificially force an assert. */
-	CONFIG_ASSERT( uxCriticalNesting == 1000UL );
+	configASSERT( uxCriticalNesting == 1000UL );
 }
 /*-----------------------------------------------------------*/
 
@@ -255,7 +255,7 @@ void vPortEnterCritical( void )
 
 void vPortExitCritical( void )
 {
-	CONFIG_ASSERT( uxCriticalNesting );
+	configASSERT( uxCriticalNesting );
     uxCriticalNesting--;
     if( uxCriticalNesting == 0 )
     {
@@ -361,7 +361,7 @@ uint32_t ulPreviousMask;
 void prvSetupTimerInterrupt( void )
 {
 	/* Configure SysTick to interrupt at the requested rate. */
-	*(portNVIC_SYSTICK_LOAD) = ( CONFIG_CPU_CLOCK_HZ / CONFIG_TICK_RATE_HZ ) - 1UL;
+	*(portNVIC_SYSTICK_LOAD) = ( configCPU_CLOCK_HZ / configTICK_RATE_HZ ) - 1UL;
 	*(portNVIC_SYSTICK_CTRL) = portNVIC_SYSTICK_CLK | portNVIC_SYSTICK_INT | portNVIC_SYSTICK_ENABLE;
 }
 /*-----------------------------------------------------------*/
