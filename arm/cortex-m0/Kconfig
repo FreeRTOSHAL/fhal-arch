@@ -2,6 +2,8 @@ comment "Cortex-M0 Settings"
 config ARCH_INCLUDE
 	string 
 	default "-Iarch/arm/cortex-m0 -Iarch/arm/include"
+
+if ARCH_ARM_CORTEX_M0=y
 config ARCH_CFLAGS
 	string
 	default "-mthumb -mcpu=cortex-m0 -march=armv6-m -mtune=cortex-m0"
@@ -11,3 +13,15 @@ config ARCH_AFLAGS
 config ARCH_LDFLAGS
 	string
 	default ""
+endif
+if ARCH_ARM_CORTEX_M0PLUS=y
+config ARCH_CFLAGS
+	string
+	default "-mthumb -mcpu=cortex-m0plus -march=armv6-m -mtune=cortex-m0plus"
+config ARCH_AFLAGS
+	string
+	default "-mthumb -mcpu=cortex-m0plus -march=armv6-m -mtune=cortex-m0plus"
+config ARCH_LDFLAGS
+	string
+	default ""
+endif

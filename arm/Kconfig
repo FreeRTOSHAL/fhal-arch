@@ -5,6 +5,10 @@ choice
 		bool "ARM Cortex-M0"
 		help
 			ARM Cortex-M0
+	config ARCH_ARM_CORTEX_M0PLUS
+		bool "ARM Cortex-M0+"
+		help
+			ARM Cortex-M0+
 	config ARCH_ARM_CORTEX_M3
 		bool "ARM Cortex-M3/M4"
 		help
@@ -14,7 +18,7 @@ choice
 		help
 			ARM Cortex-M4F
 endchoice
-if ARCH_ARM_CORTEX_M0=y
+if ARCH_ARM_CORTEX_M0=y || ARCH_ARM_CORTEX_M0PLUS
 source arch/arm/cortex-m0/Kconfig
 endif
 if ARCH_ARM_CORTEX_M3=y
