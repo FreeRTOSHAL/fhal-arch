@@ -14,6 +14,16 @@ choice
 		help
 			ARM Cortex-M4F
 endchoice
+config ARCH_ARM_FAULT_HANDLER
+	bool
+	depends on MACH_USE_GENERIC_FAULT_HANDLER
+	depends on ARCH_ARM_CORTEX_M0=y || ARCH_ARM_CORTEX_M3=y || ARCH_ARM_CORTEX_M4F=y
+
+	default y
+config ARCH_ARM_PRINT_ERROR
+	bool "Print error to Console"
+	depends on ARCH_ARM_FAULT_HANDLER
+	default n
 if ARCH_ARM_CORTEX_M0=y
 source arch/arm/cortex-m0/Kconfig
 endif
