@@ -3,6 +3,8 @@
 #include <system.h>
 #include <vector.h>
 #include <core_cm4.h>
+#include <FreeRTOS.h>
+#include <task.h>
 /* 
  * MemManage Fault Status Register
  */
@@ -242,8 +244,11 @@ void fault_handlerC(uint32_t *hardfault_args) {
 outPrintStack:
 	PRINT_ERROR("R0: 0x%lx R1: 0x%lx R2: 0x%lx R3: 0x%lx R12: 0x%lx LR: 0x%lx PC: 0x%lx PSR: 0x%lx\n", stacked_r0, stacked_r1, stacked_r2, stacked_r3, stacked_r12, stacked_lr, stacked_pc, stacked_psr);
 out:
+#ifdef CONFIG_INCLUDE_pcTaskGetTaskName
+	PRINT_ERROR("Taskname: %s\n", pcTaskGetTaskName(NULL));
+#endif
 	PRINT_ERROR("Kernel Panic\n");
 	PRINT_ERROR("Halt System\n");
 	asm("dbg #0");
 	for (;;);
-}	
+}
