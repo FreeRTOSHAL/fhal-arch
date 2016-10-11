@@ -104,6 +104,9 @@ void fault_handlerC(uint32_t *hardfault_args) {
 		PRINT_ERROR("HardFault: BusFault on a vector table read during exception processing");
 #endif
 	}
+#ifndef CONFIG_ARCH_ARM_PRINT_ERROR
+	USER_ERROR_HANDLER();
+#endif
 	/*
 	 * Check is MemManage Fault
 	 */
@@ -248,6 +251,8 @@ out:
 	PRINT_ERROR("Taskname: %s\n", pcTaskGetTaskName(NULL));
 #endif
 	PRINT_ERROR("Kernel Panic\n");
+	/* Call user Error Handler */
+	USER_ERROR_HANDLER();
 	PRINT_ERROR("Halt System\n");
 	asm("dbg #0");
 	for (;;);
