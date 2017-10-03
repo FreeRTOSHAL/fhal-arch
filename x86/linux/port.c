@@ -53,14 +53,12 @@
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the Posix port.
  *----------------------------------------------------------*/
-
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
 #include <errno.h>
-#include <sys/time.h>
-#include <time.h>
 #include <sys/times.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -69,6 +67,13 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+
+/* Linux Port need malloc and free*/
+#ifdef CONFIG_SUPPORT_STATIC_ALLOCATION
+#include <stdlib.h>
+# define pvPortMalloc malloc
+# define vPortFree free
+#endif
 /*-----------------------------------------------------------*/
 
 #define MAX_NUMBER_OF_TASKS 		( _POSIX_THREAD_THREADS_MAX )

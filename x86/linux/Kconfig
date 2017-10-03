@@ -11,6 +11,9 @@ config ARCH_AFLAGS
 config ARCH_LDFLAGS
 	string
 	default ""
+config ARCH_DEFINE_RUN_TIME_STATS
+	bool
+	default y
 #config ARCH_HAS_OPTIMISED_TASK_SELECTION
 #	bool
 #	default y
