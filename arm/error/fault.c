@@ -107,10 +107,8 @@ void fault_handlerC(uint32_t *hardfault_args) {
 #ifndef CONFIG_ARCH_ARM_PRINT_ERROR
 	USER_ERROR_HANDLER();
 #endif
-	/*
-	 * Check is MemManage Fault
-	 */
-	if (MMFSR & MMARVALID) {
+	PRINT_ERROR("MMFSR: %lx\n", MMFSR);
+	{
 		/* 
 		 * This fault occurs on any access to an XN region, even when the MPU is disabled or not present.
 		 * When this bit is 1, the PC value stacked for the exception return points to the faulting
@@ -148,14 +146,18 @@ void fault_handlerC(uint32_t *hardfault_args) {
 		 * MemManage fault occurred during floating-point lazy state preservation.
 		 */
 		if (MMFSR & MLSPERR) {
-			PRINT_ERROR("MemManage Fault: occurred during floating-point lazy state preservation");
+			PRINT_ERROR("MemManage Fault: occurred during floating-point lazy state preservation\n");
 			stackValid = true;
 		}
+		/*
+		 * Check Manage Fault Address Register (MMFAR) valid flag
+		 */
+		/*if (MMFSR & MMARVALID) {
+			PRINT_ERROR("MMFAR: 0x$lx\n", MMFAR);
+		}*/
 	}
-	/*
-	 * Check is BusFault
-	 */
-	if (BFSR & BFARVALID) {
+	PRINT_ERROR("BFSR: %lx\n", BFSR);
+	{
 		/*
 		 * This fault is chained to the handler. This means that when the processor sets this bit to 1, the original return
 		 * stack is still present. The processor does not adjust the SP from the failing return, does not performed a
@@ -204,7 +206,14 @@ void fault_handlerC(uint32_t *hardfault_args) {
 			PRINT_ERROR("BusFault: during floating-point lazy state preservation\n");
 			stackValid = true;
 		}
+		/*
+		 * Check is BusFault
+		 */
+		/*if (BFSR & BFARVALID) {
+			PRINT_ERROR("MMAR: 0x%0lx\n", MMAR);
+		}*/
 	}
+	PRINT_ERROR("UFSR: %lx\n", UFSR);
 	/* 
 	 * When this bit is set to 1, the PC value stacked for the exception return points to the undefined instruction.
 	 * An undefined instruction is an instruction that the processor cannot decode.
@@ -245,7 +254,24 @@ void fault_handlerC(uint32_t *hardfault_args) {
 		goto out;
 	}
 outPrintStack:
-	PRINT_ERROR("R0: 0x%lx R1: 0x%lx R2: 0x%lx R3: 0x%lx R12: 0x%lx LR: 0x%lx PC: 0x%lx PSR: 0x%lx\n", stacked_r0, stacked_r1, stacked_r2, stacked_r3, stacked_r12, stacked_lr, stacked_pc, stacked_psr);
+	PRINT_ERROR(
+		"R0: 0x%lx "
+		"R1: 0x%lx "
+		"R2: 0x%lx "
+		"R3: 0x%lx "
+		"R12: 0x%lx "
+		"LR: 0x%lx "
+		"PC: 0x%lx "
+		"PSR: 0x%lx\n", 
+		stacked_r0, 
+		stacked_r1, 
+		stacked_r2, 
+		stacked_r3, 
+		stacked_r12, 
+		stacked_lr, 
+		stacked_pc, 
+		stacked_psr
+	);
 out:
 #ifdef CONFIG_INCLUDE_pcTaskGetTaskName
 	PRINT_ERROR("Taskname: %s\n", pcTaskGetTaskName(NULL));
