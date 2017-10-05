@@ -24,6 +24,10 @@ config ARCH_ARM_PRINT_ERROR
 	bool "Print error to Console"
 	depends on ARCH_ARM_FAULT_HANDLER
 	default n
+config ARCH_SUPPORT_UNWIND_TABLES
+	bool
+	depends on NEWLIB
+	default y
 if ARCH_ARM_CORTEX_M0=y
 source arch/arm/cortex-m0/Kconfig
 endif

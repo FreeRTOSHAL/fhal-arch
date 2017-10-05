@@ -107,7 +107,6 @@ void fault_handlerC(uint32_t *hardfault_args) {
 #ifndef CONFIG_ARCH_ARM_PRINT_ERROR
 	USER_ERROR_HANDLER();
 #endif
-	PRINT_ERROR("MMFSR: %lx\n", MMFSR);
 	{
 		/* 
 		 * This fault occurs on any access to an XN region, even when the MPU is disabled or not present.
@@ -156,7 +155,6 @@ void fault_handlerC(uint32_t *hardfault_args) {
 			PRINT_ERROR("MMFAR: 0x$lx\n", MMFAR);
 		}*/
 	}
-	PRINT_ERROR("BFSR: %lx\n", BFSR);
 	{
 		/*
 		 * This fault is chained to the handler. This means that when the processor sets this bit to 1, the original return
@@ -213,39 +211,40 @@ void fault_handlerC(uint32_t *hardfault_args) {
 			PRINT_ERROR("MMAR: 0x%0lx\n", MMAR);
 		}*/
 	}
-	PRINT_ERROR("UFSR: %lx\n", UFSR);
-	/* 
-	 * When this bit is set to 1, the PC value stacked for the exception return points to the undefined instruction.
-	 * An undefined instruction is an instruction that the processor cannot decode.
-	 */
-	if (UFSR & UNDEFINSTR) {
-		PRINT_ERROR("UsageFault: Can't decode instruction\n");
-	}
-	/*
-	 * When this bit is set to 1, the PC value stacked for the exception return points to the instruction that
-	 * attempted the illegal use of the EPSR.
-	 * This bit is not set to 1 if an undefined instruction uses the EPSR.
-	 */
-	if (UFSR & INVSTATE) {
-		PRINT_ERROR("UsageFault: illegal use of EPSR\n");
-	}
-	/* 
-	 * the processor has attempted an illegal load of EXC_RETURN to the PC, as a result of an invalid
-	 * context, or an invalid EXC_RETURN value.
-	 * When this bit is set to 1, the PC value stacked for the exception return points to the instruction that tried
-	 * to perform the illegal load of the PC.
-	 */
-	if (UFSR & INVPC) {
-		PRINT_ERROR("UsageFault: Illegal PC on return form exception\n");
-	}
-	if (UFSR & NOCP) {
-		PRINT_ERROR("UsageFault: The processor does not support coprocessor instruction\n");
-	}
-	if (UFSR & UNALIGNED) {
-		PRINT_ERROR("UsageFault: Unaligned access\n");
-	}
-	if (UFSR & DIVBYZERO) {
-		PRINT_ERROR("UsageFault: Divide by zero :P\n");
+	{
+		/* 
+		 * When this bit is set to 1, the PC value stacked for the exception return points to the undefined instruction.
+		 * An undefined instruction is an instruction that the processor cannot decode.
+		 */
+		if (UFSR & UNDEFINSTR) {
+			PRINT_ERROR("UsageFault: Can't decode instruction\n");
+		}
+		/*
+		 * When this bit is set to 1, the PC value stacked for the exception return points to the instruction that
+		 * attempted the illegal use of the EPSR.
+		 * This bit is not set to 1 if an undefined instruction uses the EPSR.
+		 */
+		if (UFSR & INVSTATE) {
+			PRINT_ERROR("UsageFault: illegal use of EPSR\n");
+		}
+		/* 
+		 * the processor has attempted an illegal load of EXC_RETURN to the PC, as a result of an invalid
+		 * context, or an invalid EXC_RETURN value.
+		 * When this bit is set to 1, the PC value stacked for the exception return points to the instruction that tried
+		 * to perform the illegal load of the PC.
+		 */
+		if (UFSR & INVPC) {
+			PRINT_ERROR("UsageFault: Illegal PC on return form exception\n");
+		}
+		if (UFSR & NOCP) {
+			PRINT_ERROR("UsageFault: The processor does not support coprocessor instruction\n");
+		}
+		if (UFSR & UNALIGNED) {
+			PRINT_ERROR("UsageFault: Unaligned access\n");
+		}
+		if (UFSR & DIVBYZERO) {
+			PRINT_ERROR("UsageFault: Divide by zero :P\n");
+		}
 	}
 
 	if (stackValid) {
@@ -279,6 +278,7 @@ out:
 	PRINT_ERROR("Kernel Panic\n");
 	/* Call user Error Handler */
 	USER_ERROR_HANDLER();
+	BACKTRACE();
 	PRINT_ERROR("Halt System\n");
 	asm("dbg #0");
 	for (;;);
