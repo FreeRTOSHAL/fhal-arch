@@ -37,3 +37,4 @@ endif
 if ARCH_ARM_CORTEX_M4F=y
 source arch/arm/cortex-m4f/Kconfig
 endif
+source arch/arm/debug/Kconfig

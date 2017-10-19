@@ -1,0 +1,14 @@
+menuconfig ARCH_ARM_DEBUG
+	bool "ARM Debug"
+	depends on ARCH_ARM_CORTEX_M0 || ARCH_ARM_CORTEX_M3 || ARCH_ARM_CORTEX_M4F
+if ARCH_ARM_DEBUG=y
+config SEMIHOSTING
+	bool "Semihosting"
+	default n
+	config SEMIHOSTING_UART
+		bool "Semihosting UART"
+		depends on  SEMIHOSTING
+		default y
+		help
+			Semihosting UART Support
+endif

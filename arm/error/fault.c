@@ -2,7 +2,15 @@
 #include <stdbool.h>
 #include <system.h>
 #include <vector.h>
-#include <core_cm4.h>
+#if defined CONFIG_ARCH_ARM_CORTEX_M0
+# include <core_cm0.h>
+#elif defined CONFIG_ARCH_ARM_CORTEX_M3
+# include <core_cm3.h>
+#elif defined CONFIG_ARCH_ARM_CORTEX_M4F
+# include <core_cm4.h>
+#else
+# error "Arch unknown"
+#endif
 #include <FreeRTOS.h>
 #include <task.h>
 /* 
