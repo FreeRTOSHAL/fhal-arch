@@ -14,6 +14,10 @@ choice
 		help
 			ARM Cortex-M4F
 endchoice
+config ARCH_JUMP_ADDR_ODD
+	bool
+	depends on ARCH_ARM_CORTEX_M0 || ARCH_ARM_CORTEX_M3 || ARCH_ARM_CORTEX_M4F
+	default y
 config ARCH_ARM_FAULT_HANDLER
 	bool
 	depends on MACH_USE_GENERIC_FAULT_HANDLER
@@ -27,6 +31,9 @@ config ARCH_ARM_PRINT_ERROR
 config ARCH_SUPPORT_UNWIND_TABLES
 	bool
 	depends on NEWLIB
+	default y
+config ARCH_SUPPORT_CUSTOM_TASK_RETURN_ADDRESS
+	bool
 	default y
 if ARCH_ARM_CORTEX_M0=y
 source arch/arm/cortex-m0/Kconfig
