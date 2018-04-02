@@ -81,6 +81,7 @@ UART_PUTC_ISR(semihosting, uart, c) {
 	semihosting_systemCall(SYS_WRITEC, (uint32_t) &c);
 	return 0;
 }
+#ifndef CONFIG_UART_GENERIC_STRING
 UART_PUTS_ISR(semihosting, uart, data) {
 	if (!semihosting_debugIsEnabled()) {
 		/* igonre Debug is Enabled */
@@ -89,6 +90,32 @@ UART_PUTS_ISR(semihosting, uart, data) {
 	semihosting_systemCall(SYS_WRITE0, (uint32_t) data);
 	return 0;
 }
+#endif
+#ifndef CONFIG_UART_GENERIC_BYTE
+UART_READ(semihosting, uart, data, length, waittime) {
+	return -1;
+}
+UART_WRITE(semihosting, uart, data, length, waittime) {
+	int32_t ret;
+	uart_lock(uart, waittime, -1);
+	ret = uart_writeISR(uart, data, length);
+	uart_unlock(uart, -1);
+	return ret;
+}
+UART_WRITE_ISR(semihosting, uart, data, length) {
+	int32_t ret;
+	for (int i = 0; i < length; i++) {
+		ret = uart_putcISR(uart, data[i]);
+		if (ret < 0) {
+			return ret;
+		}
+	}
+	return 0;
+}
+UART_READ_ISR(semihosting, uart, data, length) {
+	return -1;
+}
+#endif
 UART_OPS(semihosting);
 struct uart semihosting_uart = {
 	UART_INIT_DEV(semihosting)
