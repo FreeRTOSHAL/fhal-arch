@@ -85,6 +85,7 @@ r0p1 port. */
 /* Constants required to manipulate the VFP. */
 #define portFPCCR							( ( volatile uint32_t * ) 0xe000ef34 ) /* Floating point context control register. */
 #define portASPEN_AND_LSPEN_BITS			( 0x3UL << 30UL )
+#define portASPEN_BITS					( 0x1UL << 31UL )
 
 /* Constants required to set up the initial stack. */
 #define portINITIAL_XPSR					( 0x01000000 )
@@ -372,9 +373,12 @@ BaseType_t xPortStartScheduler( void )
 
 	/* Ensure the VFP is enabled - it should be anyway. */
 	vPortEnableVFP();
-
+#ifdef CONFIG_ARCH_ARM_ERRATA_709718
+	*( portFPCCR ) |= portASPEN_BITS;
+#else
 	/* Lazy save always. */
 	*( portFPCCR ) |= portASPEN_AND_LSPEN_BITS;
+#endif
 
 	/* Start the first task. */
 	prvPortStartFirstTask();

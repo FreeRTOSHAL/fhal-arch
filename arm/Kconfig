@@ -18,6 +18,34 @@ config ARCH_JUMP_ADDR_ODD
 	bool
 	depends on ARCH_ARM_CORTEX_M0 || ARCH_ARM_CORTEX_M3 || ARCH_ARM_CORTEX_M4F
 	default y
+config ARCH_ARM_ERRATA_709718
+	bool "Fix ARM Errata 709718: VDIV or VSQRT instructions might not complete correctly when very short ISRs are used"
+	depends on ARCH_ARM_CORTEX_M4F
+	default y
+	help
+		Arm Errata 709718: VDIV or VSQRT instructions might not complete correctly when very short
+		ISRs are used
+		Affects: Cortex-M4F
+		Fault Type: Programmer Category B
+		Fault Status: Present in: r0p0, r0p1 Open.
+		On Cortex-M4 with FPU, the VDIV and VSQRT instructions take 14 cycles to execute. When
+		an interrupt is taken a VDIV or VSQRT instruction is not terminated, and completes its
+		execution while the interrupt stacking occurs. If lazy context save of floating point state is
+		enabled then the automatic stacking of the floating point context does not occur until a floating
+		point instruction is executed inside the interrupt service routine.
+		Lazy context save is enabled by default. When it is enabled, the minimum time for the first
+		instruction in the interrupt service routine to start executing is 12 cycles. In certain timing
+		conditions, and if there is only one or two instructions inside the interrupt service routine, then
+		the VDIV or VSQRT instruction might not write its result to the register bank or to the FPSCR.
+		Workaround: A workaround is only required if the floating point unit is present and enabled. A workaround is
+		not required if the memory system inserts one or more wait states to every stack transaction.
+		There are two workarounds:
+		1) Disable lazy context save of floating point state by clearing LSPEN to 0 (bit 30 of the
+		FPCCR at address 0xE000EF34).
+
+		2) Ensure that every interrupt service routine contains more than 2 instructions in addition to
+		the exception return instruction.
+
 config ARCH_ARM_FAULT_HANDLER
 	bool
 	depends on MACH_USE_GENERIC_FAULT_HANDLER
