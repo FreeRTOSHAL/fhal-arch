@@ -75,6 +75,7 @@ __attribute__((naked)) void fault_handler(void) {
 	) ;
 }
 void fault_handlerC(uint32_t *hardfault_args) {
+#ifndef CONFIG_ARCH_ARM_CORTEX_M0
 	volatile uint32_t stacked_r0 ;
 	volatile uint32_t stacked_r1 ;
 	volatile uint32_t stacked_r2 ;
@@ -98,23 +99,28 @@ void fault_handlerC(uint32_t *hardfault_args) {
 	stacked_lr = ((uint32_t)hardfault_args[5]) ;
 	stacked_pc = ((uint32_t)hardfault_args[6]) ;
 	stacked_psr = ((uint32_t)hardfault_args[7]) ;
+	/**
+	 * Cortex M0 has no Fault Status Register
+	 */
 	MMFSR = (scb->CFSR & SCB_CFSR_MEMFAULTSR_Msk) >> SCB_CFSR_MEMFAULTSR_Pos;
 	BFSR = (scb->CFSR & SCB_CFSR_BUSFAULTSR_Msk) >> SCB_CFSR_BUSFAULTSR_Pos;
 	UFSR = (scb->CFSR & SCB_CFSR_USGFAULTSR_Msk) >> SCB_CFSR_USGFAULTSR_Pos;
 	HFSR = scb->HFSR;
 	if (HFSR & FORCED) {
-#ifdef CONFIG_ARCH_ARM_PRINT_ERROR
+# ifdef CONFIG_ARCH_ARM_PRINT_ERROR
 		PRINT_ERROR("HardFault\n");
-#endif
+# endif
 	}
 	if (HFSR & VECTTBL) {
-#ifdef CONFIG_ARCH_ARM_PRINT_ERROR
+# ifdef CONFIG_ARCH_ARM_PRINT_ERROR
 		PRINT_ERROR("HardFault: BusFault on a vector table read during exception processing");
-#endif
+# endif
 	}
+#endif /* ifndef CONFIG_ARCH_ARM_CORTEX_M0 */
 #ifndef CONFIG_ARCH_ARM_PRINT_ERROR
 	USER_ERROR_HANDLER();
 #endif
+#ifndef CONFIG_ARCH_ARM_CORTEX_M0
 	{
 		/* 
 		 * This fault occurs on any access to an XN region, even when the MPU is disabled or not present.
@@ -280,6 +286,7 @@ outPrintStack:
 		stacked_psr
 	);
 out:
+#endif /* ifndef CONFIG_ARCH_ARM_CORTEX_M0 */
 #ifdef CONFIG_INCLUDE_pcTaskGetTaskName
 	PRINT_ERROR("Taskname: %s\n", pcTaskGetTaskName(NULL));
 #endif
@@ -288,6 +295,8 @@ out:
 	USER_ERROR_HANDLER();
 	BACKTRACE();
 	PRINT_ERROR("Halt System\n");
+#ifndef CONFIG_ARCH_ARM_CORTEX_M0
 	asm("dbg #0");
+#endif
 	for (;;);
 }
