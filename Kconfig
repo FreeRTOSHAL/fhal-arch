@@ -5,13 +5,17 @@ choice
 		bool "ARM"
 		help
 			ARM Based Architecture
+	config ARCH_AVR
+		bool "AVR"
+		help
+			AVR Based Architecture
 	config ARCH_X86
 		bool "X86"
 		help
 			X86 Based Architecture
 endchoice
 comment "Global Settings"
-comment "Waring CPU Clock Hz not set!"
+comment "Warning CPU Clock Hz not set!"
 	depends on CPU_CLOCK_HZ=0
 choice	
 	prompt "Select CPU Clock Speed Source"
@@ -35,6 +39,9 @@ config CPU_CLOCK_HZ
 comment "Architecture Settings"
 if ARCH_ARM=y
 source arch/arm/Kconfig
+endif
+if ARCH_AVR=y
+source arch/avr/Kconfig
 endif
 if ARCH_X86=y
 source arch/x86/Kconfig
