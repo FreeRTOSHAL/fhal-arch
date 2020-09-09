@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.2.1
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.3.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -84,7 +84,6 @@ r0p1 port. */
 /* Constants required to manipulate the VFP. */
 #define portFPCCR							( ( volatile uint32_t * ) 0xe000ef34 ) /* Floating point context control register. */
 #define portASPEN_AND_LSPEN_BITS			( 0x3UL << 30UL )
-#define portASPEN_BITS                                  ( 0x1UL << 31UL )
 
 /* Constants required to set up the initial stack. */
 #define portINITIAL_XPSR					( 0x01000000 )
@@ -373,12 +372,8 @@ BaseType_t xPortStartScheduler( void )
 	/* Ensure the VFP is enabled - it should be anyway. */
 	vPortEnableVFP();
 
-#ifdef CONFIG_ARCH_ARM_ERRATA_709718
-	*( portFPCCR ) |= portASPEN_BITS;
-#else
 	/* Lazy save always. */
 	*( portFPCCR ) |= portASPEN_AND_LSPEN_BITS;
-#endif
 
 	/* Start the first task. */
 	prvPortStartFirstTask();
@@ -669,7 +664,7 @@ void xPortSysTickHandler( void )
 			vTaskStepTick( ulCompleteTickPeriods );
 			portNVIC_SYSTICK_LOAD_REG = ulTimerCountsForOneTick - 1UL;
 
-			/* Exit with interrpts enabled. */
+			/* Exit with interrupts enabled. */
 			__asm volatile( "cpsie i" ::: "memory" );
 		}
 	}

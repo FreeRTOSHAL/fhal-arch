@@ -11,3 +11,6 @@ config ARCH_AFLAGS
 config ARCH_LDFLAGS
 	string
 	default ""
+config ARCH_HAS_TICKLESS_SUPPORT
+	bool
+	default y
