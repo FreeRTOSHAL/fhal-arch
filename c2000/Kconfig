@@ -1,0 +1,11 @@
+choice
+	prompt "Select Core Type"
+	config ARCH_C2000_C28x
+		bool "TI C2000 C28x DSP"
+		help
+			TI C2000 C28x DSP
+
+endchoice
+if ARCH_C2000_C28x=y
+source arch/c2000/c28x/Kconfig
+endif

@@ -9,6 +9,10 @@ choice
 		bool "X86"
 		help
 			X86 Based Architecture
+	config ARCH_C2000
+		bool "c2000"
+		help
+			C2000 Based DSP Architecture
 endchoice
 comment "Global Settings"
 comment "Waring CPU Clock Hz not set!"
@@ -38,5 +42,8 @@ source arch/arm/Kconfig
 endif
 if ARCH_X86=y
 source arch/x86/Kconfig
+endif
+if ARCH_C2000=y
+source arch/c2000/Kconfig
 endif
 endmenu

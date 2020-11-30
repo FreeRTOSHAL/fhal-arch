@@ -1,0 +1,13 @@
+comment "C2000 C28x DSP Settings"
+config ARCH_INCLUDE
+	string
+	default "-Iarch/c2000/c28x -Iarch/c2000/include -I$(shell dirname $(shell which $(CC)))/../include"
+config ARCH_CFLAGS
+	string
+	default ""
+config ARCH_AFLAGS
+	string
+	default ""
+config ARCH_LDFLAGS
+	string
+	default ""

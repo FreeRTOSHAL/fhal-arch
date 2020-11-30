@@ -1,5 +1,6 @@
 obj-$(CONFIG_ARCH_ARM)+=arm/
 obj-$(CONFIG_ARCH_X86)+=x86/
+obj-$(CONFIG_ARCH_C2000)+=c2000/
 
 obj-$(CONFIG_GEN_VERSION) += version.o
 BUILDID := $(USER)@$(shell hostname) $(shell date +'%Y-%m-%d %H:%M:%S')
