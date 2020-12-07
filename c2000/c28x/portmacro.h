@@ -45,8 +45,8 @@
 #define portLONG        uint32_t
 #define portSHORT       uint16_t
 #define portBASE_TYPE   uint16_t
-#define uint8_t        	uint8_least_t
-#define int8_t          int8_least_t
+#define uint8_t        	uint_least8_t
+#define int8_t          int_least8_t
 #define portSTACK_TYPE  uint16_t
 
 typedef portSTACK_TYPE StackType_t;
