@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.1
+ * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -71,6 +71,7 @@
 
 /* Architecture specifics. */
     #define portSTACK_GROWTH      ( -1 )
+    #define portTICK_PERIOD_MS    ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
     #if configTICK_RATE_HZ > 1000
     # define portTICK_PERIOD_MS                    1 * ( ( TickType_t ) configTICK_RATE_HZ / 1000 )
     #else
