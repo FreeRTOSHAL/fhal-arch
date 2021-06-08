@@ -30,7 +30,7 @@ struct uart {
 };
 
 
-UART_INIT(semihosting, port, bautrate) {
+UART_INIT(semihosting, port, baudrate) {
 	struct uart *uart = (struct uart *) UART_GET_DEV(port);
 	int32_t ret;
 	if (uart == NULL) {
@@ -47,7 +47,7 @@ UART_INIT(semihosting, port, bautrate) {
 		return uart;
 	}
 	/* ignored */
-	(void) bautrate;
+	(void) baudrate;
 	return uart;
 }
 UART_DEINIT(semihosting, uart) {
