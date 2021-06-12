@@ -13,6 +13,10 @@ choice
 		bool "c2000"
 		help
 			C2000 Based DSP Architecture
+	config ARCH_FRAMAC
+		bool "Frama-C"
+		help
+			Frama-C Verfication Architecture
 endchoice
 comment "Global Settings"
 comment "Waring CPU Clock Hz not set!"
