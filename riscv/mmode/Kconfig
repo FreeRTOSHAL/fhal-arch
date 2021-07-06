@@ -1,0 +1,3 @@
+config ARCH_INCLUDE
+	string 
+	default "-Iarch/riscv/mmode -Iarch/riscv/include"

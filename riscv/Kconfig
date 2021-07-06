@@ -1,0 +1,64 @@
+# Slected by Mach
+choice
+	prompt "Select Mode"
+	config ARCH_RISCV_MMODE
+		bool "Machine-mode / User-mode"
+	# No Port Available  
+	#config ARCH_RISCV_SMODE
+	#	bool "Supervisor-mode / User-mode"
+endchoice
+if ARCH_RISCV_MMODE=y
+source arch/riscv/mmode/Kconfig 
+endif
+
+config ARCH_CFLAGS
+	string
+	default "-mcmodel=medany"
+config ARCH_AFLAGS
+	string 
+	default "-mcmodel=medany"
+
+config ARCH_LDFLAGS
+	string
+	default ""
+
+config EXTRA_ARCH_LINKFLAGS
+	string
+	default "-nostartfiles"
+
+config ARCH_HAS_OPTIMISED_TASK_SELECTION
+	bool
+	default y
+
+config ARCH_RISCV_PLIC
+	bool
+	depends on MACH_HAS_PLIC
+	default y
+
+config ARCH_RISCV_HAS_MTIME
+	bool
+	depends on MACH_HAS_MTIME
+	default y
+
+config ARCH_RISCV_SEP_IRQ_STACK
+	bool "Separated IRQ Stack"
+	default n
+	help
+		Separated IRQ Stack if not defined Main Stack is used
+	config ARCH_RISCV_ISR_STACK_SIZE_WORDS
+		int "ISR STACK SIZE WORDS"
+		depends on ARCH_RISCV_SEP_IRQ_STACK
+		default 500
+config ARCH_RISCV_HAS_CLINT
+	bool
+	default y
+	depends on MACH_HAS_CLINT
+
+config INCLUDE_ARCH_FREEROTS_CONFIG
+	bool
+	default y
+
+config ARCH_RISCV_INIT
+	bool
+	default y
+	depends on MACH_NEED_RISCV_INIT

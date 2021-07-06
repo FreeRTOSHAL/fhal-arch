@@ -17,6 +17,10 @@ choice
 		bool "Frama-C"
 		help
 			Frama-C Verfication Architecture
+	config ARCH_RISCV
+		bool "RISC-V"
+		help
+			RISC-V Based Architecture
 endchoice
 comment "Global Settings"
 comment "Waring CPU Clock Hz not set!"
@@ -49,5 +53,8 @@ source arch/x86/Kconfig
 endif
 if ARCH_C2000=y
 source arch/c2000/Kconfig
+endif
+if ARCH_RISCV=y
+source arch/riscv/Kconfig 
 endif
 endmenu
