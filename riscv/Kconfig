@@ -2,13 +2,16 @@
 choice
 	prompt "Select Mode"
 	config ARCH_RISCV_MMODE
-		bool "Machine-mode / User-mode"
+		bool "Machine-mode only"
 	# No Port Available  
-	#config ARCH_RISCV_SMODE
-	#	bool "Supervisor-mode / User-mode"
+	config ARCH_RISCV_SMODE
+		bool "Supervisor-mode / User-mode"
 endchoice
 if ARCH_RISCV_MMODE=y
 source arch/riscv/mmode/Kconfig 
+endif
+if ARCH_RISCV_SMODE=y
+source arch/riscv/smode/Kconfig 
 endif
 
 config ARCH_CFLAGS
@@ -38,6 +41,7 @@ config ARCH_RISCV_PLIC
 config ARCH_RISCV_HAS_MTIME
 	bool
 	depends on MACH_HAS_MTIME
+	depends on ARCH_RISCV_MMODE
 	default y
 
 config ARCH_RISCV_SEP_IRQ_STACK
@@ -62,3 +66,12 @@ config ARCH_RISCV_INIT
 	bool
 	default y
 	depends on MACH_NEED_RISCV_INIT
+
+config ARCH_SBI
+	bool "SBI Interface"
+	default y
+	depends on ARCH_RISCV_SMODE
+	config ARCH_SBI_TIMER
+		bool "SBI Timer"
+		default y
+		depends on ARCH_SBI

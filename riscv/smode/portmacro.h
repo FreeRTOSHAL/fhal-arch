@@ -1,6 +1,7 @@
 /*
  * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (C) 2021 Andreas Werner <kernel@andy89.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,8 +25,9 @@
  *
  * 1 tab == 4 spaces!
  */
-
-
+/**
+ * S/U-Mode implementation based on M-Mode Port
+ */
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
@@ -91,7 +93,7 @@ not need to be guarded with a critical section. */
 
 /* Scheduler utilities. */
 extern void vTaskSwitchContext( void );
-#define portYIELD() __asm volatile( "ecall" );
+#define portYIELD() __asm volatile( "mv a7, x0; ecall" );
 #define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired ) vTaskSwitchContext()
 #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/
@@ -104,13 +106,8 @@ extern void vTaskExitCritical( void );
 
 #define portSET_INTERRUPT_MASK_FROM_ISR() 0
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusValue ) ( void ) uxSavedStatusValue
-#ifdef CONFIG_ARCH_RISCV_MMODE
-# define portDISABLE_INTERRUPTS()	__asm volatile( "csrc mstatus, 8" )
-# define portENABLE_INTERRUPTS()		__asm volatile( "csrs mstatus, 8" )
-#else
-# define portDISABLE_INTERRUPTS()	__asm volatile( "csrc sstatus, 1" )
-# define portENABLE_INTERRUPTS()		__asm volatile( "csrs sstatus, 1" )
-#endif
+#define portDISABLE_INTERRUPTS()	__asm volatile( "li a7, 0x2; ecall" )
+#define portENABLE_INTERRUPTS()		__asm volatile( "li a7, 0x1; ecall" )
 #define portENTER_CRITICAL()	vTaskEnterCritical()
 #define portEXIT_CRITICAL()		vTaskExitCritical()
 
@@ -182,6 +179,7 @@ definition is found. */
 #endif
 
 
+extern uint32_t ulHartId;
 
 #ifdef __cplusplus
 }

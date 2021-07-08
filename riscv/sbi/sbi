@@ -1,0 +1,36 @@
+%s/|[ \t]*\([a-z0-9_]*\)[ \t]*|[ \t]*\([0-9]*\)[ \t]*|[ \t]*\(0x[0-9a-fA-F]*\)/#define \U\1\e_FID \2\r#define \U\1\e_EXT \
+%s/|[ \t]*\([a-z0-9_]*\)[ \t]*|[ \t]*\([0-9]*\)[ \t]*|[ \t]*\(0x[0-9a-fA-F]*\)/SBICALL_FUNC(\1, \U\1\e_FID, \U\1\e_EXT)
+| Function Name                 | Function ID | Extension ID
+| sbi_get_sbi_spec_version      |           0 |         0x10
+| sbi_get_sbi_impl_id           |           1 |         0x10
+| sbi_get_sbi_impl_version      |           2 |         0x10
+| sbi_probe_extension           |           3 |         0x10
+| sbi_get_mvendorid             |           4 |         0x10
+| sbi_get_marchid               |           5 |         0x10
+| sbi_get_mimpid                |           6 |         0x10
+| sbi_set_timer                 |           0 |         0x00
+| sbi_console_putchar           |           0 |         0x01
+| sbi_console_getchar           |           0 |         0x02
+| sbi_clear_ipi                 |           0 |         0x03
+| sbi_send_ipi                  |           0 |         0x04
+| sbi_remote_fence_i            |           0 |         0x05
+| sbi_remote_sfence_vma         |           0 |         0x06
+| sbi_remote_sfence_vma_asid    |           0 |         0x07
+| sbi_shutdown                  |           0 |         0x08
+| sbi_remote_fence_i            |           0 |   0x52464E43
+| sbi_remote_sfence_vma         |           1 |   0x52464E43
+| sbi_remote_sfence_vma_asid    |           2 |   0x52464E43
+| sbi_remote_hfence_gvma_vmid   |           3 |   0x52464E43
+| sbi_remote_hfence_gvma   	|           4 |   0x52464E43
+| sbi_remote_hfence_vvma_asid   |           5 |   0x52464E43
+| sbi_remote_hfence_vvma   	|           6 |   0x52464E43
+| sbi_hart_start      		|           0 |     0x48534D
+| sbi_hart_stop           	|           1 |     0x48534D
+| sbi_hart_get_status      	|           2 |     0x48534D
+| sbi_get_sbi_spec_version      |           0 |         0x10
+| sbi_get_sbi_impl_id           |           1 |         0x10
+| sbi_get_sbi_impl_version      |           2 |         0x10
+| sbi_probe_extension           |           3 |         0x10
+| sbi_get_mvendorid             |           4 |         0x10
+| sbi_get_marchid               |           5 |         0x10
+| sbi_get_mimpid                |           6 |         0x10

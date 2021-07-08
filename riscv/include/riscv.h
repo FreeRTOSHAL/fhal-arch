@@ -16,6 +16,14 @@
 # define MCAUSE_INT             0x80000000
 #endif
 
+#if __riscv_xlen == 64
+# define CAUSE_CAUSE           0x7FFFFFFFFFFFFFFF
+# define CAUSE_INT             0x8000000000000000
+#else
+# define CAUSE_CAUSE           0x7FFFFFFF
+# define CAUSE_INT             0x80000000
+#endif
+
 #define IRQ_S_SOFT          1
 #define IRQ_H_SOFT          2
 #define IRQ_M_SOFT          3
@@ -25,6 +33,17 @@
 #define IRQ_S_EXT           9
 #define IRQ_H_EXT           10
 #define IRQ_M_EXT           11
+
+#ifdef CONFIG_ARCH_RISCV_MMODE
+# define IRQ_EXT IRQ_M_EXT
+# define IRQ_TIMER IRQ_M_TIMER
+# define IRQ_SOFT IRQ_M_SOFT
+#endif
+#ifdef CONFIG_ARCH_RISCV_SMODE
+# define IRQ_EXT IRQ_S_EXT
+# define IRQ_TIMER IRQ_S_TIMER
+# define IRQ_SOFT IRQ_S_SOFT
+#endif
 
 #define read_csr(reg) ({ \
 	unsigned long __tmp; \

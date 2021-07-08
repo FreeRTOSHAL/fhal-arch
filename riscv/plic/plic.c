@@ -14,15 +14,23 @@
 
 static inline uint32_t PLIC_ClamIRQ() {
 	uint32_t hartID = irq_getCPUID();
-	return PLIC->target[hartID].claim_complete;
+	uint32_t contexID = hartID << 1;
+#ifdef CONFIG_ARCH_RISCV_SMODE
+	contexID += 1; /* S Mode */
+#endif
+	return PLIC->target[contexID].claim_complete;
 }
 static inline void PLIC_CompleteIRQ(uint32_t source) {
 	uint32_t hartID = irq_getCPUID();
-	PLIC->target[hartID].claim_complete = source;
+	uint32_t contexID = hartID << 1;
+#ifdef CONFIG_ARCH_RISCV_SMODE
+	contexID += 1; /* S Mode */
+#endif
+	PLIC->target[contexID].claim_complete = source;
 }
 
-void irq_handler(uintptr_t mcause, uintptr_t mepc) {
-	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_EXT)) {
+void irq_handler(uintptr_t cause, uintptr_t mepc) {
+	if ((cause & CAUSE_INT) && ((cause & MCAUSE_CAUSE) == IRQ_EXT)) {
 		uint32_t irqNr = PLIC_ClamIRQ();
 		/* no pending IRQ? stop. why? */
 		CONFIG_ASSERT(irqNr != 0);
@@ -30,6 +38,13 @@ void irq_handler(uintptr_t mcause, uintptr_t mepc) {
 			vector[irqNr]();
 		}
 		PLIC_CompleteIRQ(irqNr);
+	} else if ((cause & CAUSE_INT) && ((cause & MCAUSE_CAUSE) == IRQ_TIMER)) {
+#ifdef CONFIG_ARCH_SBI_TIMER
+		extern void sbiTimerCallback();
+		sbiTimerCallback();
+#else
+		CONFIG_ASSERT(0);
+#endif
 	} else {
 		CONFIG_ASSERT(0);
 	}
@@ -39,52 +54,66 @@ int32_t irq_init() {
 	static bool init = false;
 	int i;
 	uint32_t hartID = irq_getCPUID();
+	uint32_t contexID = hartID << 1;
+#ifdef CONFIG_ARCH_RISCV_SMODE
+	contexID += 1; /* S Mode */
+#endif
 	if (init) {
 		return 0;
 	}
 	init = true;
 	/* Disable all interrupts for the current hart. */
 	for(i = 0; i < ((CONFIG_MACH_IRQ_COUNT + 32u) / 32u); i++) {
-		PLIC->targetEnable[hartID].enables[i] = 0;
-	}
-	/* if we the first Hart set up the prio */
-	if (hartID == 0) {
-		for (i = 0; i < CONFIG_MACH_IRQ_COUNT; i++) {
-			PLIC->prio[i] = 0;
-		}
+		PLIC->targetEnable[contexID].enables[i] = 0;
 	}
 
-	PLIC->target[hartID].threshold = 0;
+	for (i = 0; i < CONFIG_MACH_IRQ_COUNT; i++) {
+		PLIC->prio[i] = 0;
+	}
 
+	PLIC->target[contexID].threshold = 0;
+#ifdef CONFIG_ARCH_RISCV_MMODE
 	set_csr(mie, BIT(IRQ_M_EXT));
+#endif
+#ifdef CONFIG_ARCH_RISCV_SMODE
+	set_csr(sie, BIT(IRQ_S_EXT));
+#endif
 	return 0;
 }
 
 int32_t irq_enable(int32_t irqnr) {
 	uint32_t hartID = irq_getCPUID();
 	uint32_t current;
+	uint32_t contexID = hartID << 1;
+#ifdef CONFIG_ARCH_RISCV_SMODE
+	contexID += 1; /* S Mode */
+#endif
 	if (irqnr >= CONFIG_MACH_IRQ_COUNT) {
 		return -1;
 	}
-	current = PLIC->targetEnable[hartID].enables[irqnr / 32];
+	current = PLIC->targetEnable[contexID].enables[irqnr / 32];
 
 	current |= BIT(irqnr % 32);
 
-	PLIC->targetEnable[hartID].enables[irqnr / 32] = current;
+	PLIC->targetEnable[contexID].enables[irqnr / 32] = current;
 	return 0;
 }
 
 int32_t irq_disable(int32_t irqnr) {
 	uint32_t hartID = irq_getCPUID();
 	uint32_t current;
+	uint32_t contexID = hartID << 1;
+#ifdef CONFIG_ARCH_RISCV_SMODE
+	contexID += 1; /* S Mode */
+#endif
 	if (irqnr >= CONFIG_MACH_IRQ_COUNT) {
 		return -1;
 	}
-	current = PLIC->targetEnable[hartID].enables[irqnr / 32];
+	current = PLIC->targetEnable[contexID].enables[irqnr / 32];
 
 	current &= ~BIT(irqnr % 32);
 
-	PLIC->targetEnable[hartID].enables[irqnr / 32] = current;
+	PLIC->targetEnable[contexID].enables[irqnr / 32] = current;
 	return 0;
 }
 
@@ -99,7 +128,11 @@ int32_t irq_clear(int32_t irqnr) {
 }
 
 int32_t irq_getCPUID() {
+#ifdef CONFIG_ARCH_RISCV_MMODE
 	return read_csr(mhartid);
+#else
+	return ulHartId;
+#endif
 }
 
 int32_t irq_setPrio(int32_t irqnr, int32_t prio) {
