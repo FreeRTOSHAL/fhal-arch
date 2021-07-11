@@ -14,12 +14,43 @@ if ARCH_RISCV_SMODE=y
 source arch/riscv/smode/Kconfig 
 endif
 
+choice
+	prompt "Memmory Model"
+	config ARCH_RISCV_MEMMORY_MEDLOW
+		bool "Medlow"
+		depends on !ARCH_64BIT
+		help
+			GCC Docu:
+
+			"Generate code for the medium-low code model. The program and its statically defined symbols must lie within a
+			single 2 GiB address range and must lie between absolute addresses -2 GiB and +2 GiB. Programs can be statically
+			or dynamically linked. This is the default code model."
+
+	config ARCH_RISCV_MEMMORY_MEDANY
+		bool "medany"
+		help
+			GCC Docu:
+
+			"Generate code for the medium-any code model. The program and its statically defined symbols must be within any
+			single 2 GiB address range. Programs can be statically or dynamically linked."
+endchoice
+
+if ARCH_RISCV_MEMMORY_MEDANY=y
 config ARCH_CFLAGS
 	string
 	default "-mcmodel=medany"
 config ARCH_AFLAGS
 	string 
 	default "-mcmodel=medany"
+endif
+if ARCH_RISCV_MEMMORY_MEDLOW=y
+config ARCH_CFLAGS
+	string
+	default "-mcmodel=medlow"
+config ARCH_AFLAGS
+	string 
+	default "-mcmodel=medlow"
+endif
 
 config ARCH_LDFLAGS
 	string
