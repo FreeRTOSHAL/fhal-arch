@@ -81,6 +81,7 @@ uint64_t ullNextTime = 0ULL;
 const uint64_t *pullNextTime = &ullNextTime;
 size_t uxTimerIncrementsForOneTick; /* Assumes increment won't go over 32-bits. */
 uint32_t ulHartId;
+uint32_t ulInIsr = 1;
 
 /* Set configCHECK_FOR_STACK_OVERFLOW to 3 to add ISR stack checking to task
 stack checking.  A problem in the ISR stack will trigger an assert, not call the

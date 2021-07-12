@@ -106,3 +106,8 @@ config ARCH_SBI
 		bool "SBI Timer"
 		default y
 		depends on ARCH_SBI
+	config ARCH_SBI_UART
+		bool "SBI UART"
+		default y
+		depends on ARCH_SBI
+		depends on UART

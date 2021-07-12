@@ -93,7 +93,7 @@ not need to be guarded with a critical section. */
 
 /* Scheduler utilities. */
 extern void vTaskSwitchContext( void );
-#define portYIELD() __asm volatile( "mv a7, x0; ecall" );
+#define portYIELD() __asm volatile( "mv a7, x0; ecall" : : : "a7");
 #define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired ) vTaskSwitchContext()
 #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/
@@ -106,8 +106,8 @@ extern void vTaskExitCritical( void );
 
 #define portSET_INTERRUPT_MASK_FROM_ISR() 0
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusValue ) ( void ) uxSavedStatusValue
-#define portDISABLE_INTERRUPTS()	__asm volatile( "li a7, 0x2; ecall" )
-#define portENABLE_INTERRUPTS()		__asm volatile( "li a7, 0x1; ecall" )
+#define portDISABLE_INTERRUPTS()	__asm volatile( "li a7, 0x2; ecall"  : : : "a7")
+#define portENABLE_INTERRUPTS()		__asm volatile( "li a7, 0x1; ecall"  : : : "a7")
 #define portENTER_CRITICAL()	vTaskEnterCritical()
 #define portEXIT_CRITICAL()		vTaskExitCritical()
 
@@ -180,6 +180,7 @@ definition is found. */
 
 
 extern uint32_t ulHartId;
+extern uint32_t ulInIsr;
 
 #ifdef __cplusplus
 }

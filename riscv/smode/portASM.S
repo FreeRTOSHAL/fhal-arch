@@ -69,6 +69,7 @@ at the top of this file. */
 .extern uxTimerIncrementsForOneTick /* size_t type so 32-bit on 32-bit core and 64-bits on 64-bit core. */
 .extern xISRStackTop
 .extern portasmHANDLE_INTERRUPT
+.extern ulInIsr
 
 .align 8
 .func
@@ -108,9 +109,15 @@ freertos_risc_v_trap_handler:
 
 	portasmSAVE_ADDITIONAL_REGISTERS	/* Defined in freertos_risc_v_chip_specific_extensions.h to save any registers unique to the RISC-V implementation. */
 
+	/* set ulInIsr */
+	la t0, ulInIsr
+	li t1, 1
+	sw t1, 0(t0)
+
 	load_x  t0, pxCurrentTCB			/* Load pxCurrentTCB. */
 	store_x  sp, 0( t0 )				/* Write sp to first TCB member. */
 
+	mv s0, a0 /* save user a0 */
 	csrr a0, scause
 	csrr a1, sepc
 	/* a7 sys call */
@@ -136,6 +143,10 @@ test_if_environment_call:
 	beq a7, t0, handle_enableInterrupt
 	li t0, 2
 	beq a7, t0, handle_disableInterrupt
+	li t0, 3
+	beq a7, t0, handle_putchar
+	li t0, 4
+	beq a7, t0, handle_getchar
 	j as_yet_unhandled
 
 handle_enableInterrupt:
@@ -161,6 +172,19 @@ handle_yield:
 	jal vTaskSwitchContext
 	j processed_source
 
+handle_putchar:
+	mv a0, s0
+	li a6, 0 /* FID putchar */
+	li a7, 1 /* EXT putchar */
+	ecall
+	j processed_source
+
+handle_getchar:
+	li a6, 0 /* FID getchar  */
+	li a7, 2 /* EXT getchar */
+	ecall
+	j processed_source
+
 is_exception:
 	csrr t0, scause						/* For viewing in the debugger only. */
 	csrr t1, sepc						/* For viewing in the debugger only */
@@ -172,6 +196,10 @@ as_yet_unhandled:
 	j as_yet_unhandled
 
 processed_source:
+	/* clear ulInIsr */
+	la t0, ulInIsr
+	sw zero, 0(t0)
+
 	load_x  t1, pxCurrentTCB			/* Load pxCurrentTCB. */
 	load_x  sp, 0( t1 )				 	/* Read sp from first TCB member. */
 
@@ -231,6 +259,10 @@ xPortStartFirstTask:
 	la t0, freertos_risc_v_trap_handler
 	csrw mtvec, t0
 #endif /* portasmHAS_CLILNT */
+
+	/* clear ulInIsr */
+	la t0, ulInIsr
+	sw zero, 0(t0)
 
 	load_x  sp, pxCurrentTCB			/* Load pxCurrentTCB. */
 	load_x  sp, 0( sp )				 	/* Read sp from first TCB member. */
