@@ -12,20 +12,24 @@
 #include <plic.h>
 #include <stdbool.h>
 
+#define PLIC_SCHIFT 1
+
+#ifdef CONFIG_ARCH_RISCV_MMODE
+# define CONTEX_ID(hartID) ((hartID << PLIC_SCHIFT))
+#endif
+#ifdef CONFIG_ARCH_RISCV_SMODE
+# define CONTEX_ID(hartID) ((hartID << PLIC_SCHIFT) + 1)
+#endif
+
 static inline uint32_t PLIC_ClamIRQ() {
 	uint32_t hartID = irq_getCPUID();
-	uint32_t contexID = hartID << 1;
-#ifdef CONFIG_ARCH_RISCV_SMODE
-	contexID += 1; /* S Mode */
-#endif
+	uint32_t contexID = CONTEX_ID(hartID); 
 	return PLIC->target[contexID].claim_complete;
 }
+
 static inline void PLIC_CompleteIRQ(uint32_t source) {
 	uint32_t hartID = irq_getCPUID();
-	uint32_t contexID = hartID << 1;
-#ifdef CONFIG_ARCH_RISCV_SMODE
-	contexID += 1; /* S Mode */
-#endif
+	uint32_t contexID = CONTEX_ID(hartID); 
 	PLIC->target[contexID].claim_complete = source;
 }
 
@@ -54,22 +58,23 @@ int32_t irq_init() {
 	static bool init = false;
 	int i;
 	uint32_t hartID = irq_getCPUID();
-	uint32_t contexID = hartID << 1;
-#ifdef CONFIG_ARCH_RISCV_SMODE
-	contexID += 1; /* S Mode */
-#endif
+	uint32_t contexID = CONTEX_ID(hartID); 
 	if (init) {
 		return 0;
 	}
 	init = true;
 	/* Disable all interrupts for the current hart. */
-	for(i = 0; i < ((CONFIG_MACH_IRQ_COUNT + 32u) / 32u); i++) {
+	/* irq == 0 dosn't exists */
+	for(i = 1; i < ((CONFIG_MACH_IRQ_COUNT + 32u) / 32u); i++) {
 		PLIC->targetEnable[contexID].enables[i] = 0;
 	}
 
-	for (i = 0; i < CONFIG_MACH_IRQ_COUNT; i++) {
+	/* irq == 0 dosn't exists */
+	for (i = 1; i < CONFIG_MACH_IRQ_COUNT; i++) {
 		PLIC->prio[i] = 0;
 	}
+	CONFIG_ASSERT(offsetof(struct plic, targetEnable) == 0x2000);
+	CONFIG_ASSERT(offsetof(struct plic, target) == 0x200000);
 
 	PLIC->target[contexID].threshold = 0;
 #ifdef CONFIG_ARCH_RISCV_MMODE
@@ -84,10 +89,7 @@ int32_t irq_init() {
 int32_t irq_enable(int32_t irqnr) {
 	uint32_t hartID = irq_getCPUID();
 	uint32_t current;
-	uint32_t contexID = hartID << 1;
-#ifdef CONFIG_ARCH_RISCV_SMODE
-	contexID += 1; /* S Mode */
-#endif
+	uint32_t contexID = CONTEX_ID(hartID); 
 	if (irqnr >= CONFIG_MACH_IRQ_COUNT) {
 		return -1;
 	}
@@ -102,10 +104,7 @@ int32_t irq_enable(int32_t irqnr) {
 int32_t irq_disable(int32_t irqnr) {
 	uint32_t hartID = irq_getCPUID();
 	uint32_t current;
-	uint32_t contexID = hartID << 1;
-#ifdef CONFIG_ARCH_RISCV_SMODE
-	contexID += 1; /* S Mode */
-#endif
+	uint32_t contexID = CONTEX_ID(hartID); 
 	if (irqnr >= CONFIG_MACH_IRQ_COUNT) {
 		return -1;
 	}
