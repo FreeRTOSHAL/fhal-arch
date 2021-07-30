@@ -6,7 +6,9 @@
 #ifndef RISC_V_
 #define RISC_V_
 
+#ifndef __ASSEMBLY__
 #include <stdint.h>
+#endif
 
 #if __riscv_xlen == 64
 # define MCAUSE_CAUSE           0x7FFFFFFFFFFFFFFF
@@ -23,6 +25,11 @@
 # define CAUSE_CAUSE           0x7FFFFFFF
 # define CAUSE_INT             0x80000000
 #endif
+
+#define SR_FS (3 << 13)
+#define SR_FS_INITIAL (1 << 13)
+#define SR_FS_CLEAN (2 << 13)
+#define SR_FS_DIRTY (3 << 13)
 
 #define IRQ_S_SOFT          1
 #define IRQ_H_SOFT          2
@@ -45,6 +52,7 @@
 # define IRQ_SOFT IRQ_S_SOFT
 #endif
 
+#ifndef __ASSEMBLY__
 #define read_csr(reg) ({ \
 	unsigned long __tmp; \
 	asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
@@ -77,5 +85,6 @@
   else \
     asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "r"(bit)); \
   __tmp; })
+#endif
 
 #endif
