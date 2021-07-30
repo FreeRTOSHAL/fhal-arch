@@ -98,6 +98,27 @@ config ARCH_RISCV_INIT
 	default y
 	depends on MACH_NEED_RISCV_INIT
 
+config ARCH_RISCV_SYSINIT
+	bool
+	default y
+	depends on MACH_NEED_GENERIC_SYSINIT
+
+config ARCH_RISCV_HARDWARE_FLOAD
+	bool
+	default y
+	depends on MACH_NEED_RISCV_HARDWARE_FLOAD
+
+config ARCH_ID
+	int "Primare HartID"
+	default 0
+
+config ARCH_BOOT_UNDER_UBOOT
+	bool "Boot under UBooot"
+	depends on ARCH_RISCV_SMODE
+	default n
+	help
+		All CPU are Booted under U-Boot so wie must jump to secondary
+
 config ARCH_SBI
 	bool "SBI Interface"
 	default y
