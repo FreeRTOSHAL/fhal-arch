@@ -16,7 +16,11 @@ void vPortSetupTimerInterrupt() {
 }
 
 void sbiTimerCallback() {
+	BaseType_t ret;
 	next = next + uxTimerIncrementsForOneTick;
 	sbi_set_timer(next);
-	xTaskIncrementTick();
+	ret = xTaskIncrementTick();
+	if (ret != 0) {
+		vTaskSwitchContext();
+	}
 }
