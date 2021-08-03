@@ -47,16 +47,19 @@ UART_DEINIT(sbi, uart) {
 
 
 UART_GETC(sbi, uart, waittime) {
+	intptr_t ret; 
 	char c;
-	int lret;
 	uart_lock(uart, waittime, 255);
-	if (ulInIsr) {
-		c = sbi_console_getchar();
-	} else {
-		register uintptr_t a0 asm ("a0") = 0;
-		__asm volatile( "li a7, 4; ecall" : "+r" (a0) : : "a7");
-		c = a0;
-	}
+	do {
+		if (ulInIsr) {
+			ret = sbi_console_getchar();
+		} else {
+			register intptr_t a0 asm ("a0") = (uintptr_t)(c);
+			__asm volatile( "li a7, 4; ecall" : "+r" (a0) : : "a7");
+			ret = a0;
+		}
+	} while (ret < 0);
+	c = (char) ret;
 	uart_unlock(uart, 255);
 	return c;
 }
@@ -74,14 +77,18 @@ UART_PUTC(sbi, uart, c, waittime) {
 	return 0;
 }
 UART_GETC_ISR(sbi, uart) {
+	intptr_t ret; 
 	char c;
-	if (ulInIsr) {
-		c = sbi_console_getchar();
-	} else {
-		register uintptr_t a0 asm ("a0") = (uintptr_t)(c);
-		__asm volatile( "li a7, 4; ecall" : "+r" (a0) : : "a7");
-		c = a0;
-	}
+	do {
+		if (ulInIsr) {
+			ret = sbi_console_getchar();
+		} else {
+			register intptr_t a0 asm ("a0") = (uintptr_t)(c);
+			__asm volatile( "li a7, 4; ecall" : "+r" (a0) : : "a7");
+			ret = a0;
+		}
+	} while (ret < 0);
+	c = (char) ret;
 	return c;
 }
 UART_PUTC_ISR(sbi, uart, c) {

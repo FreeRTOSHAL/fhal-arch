@@ -186,6 +186,8 @@ handle_getchar:
 	li a6, 0 /* FID getchar  */
 	li a7, 2 /* EXT getchar */
 	ecall
+	/* now we must store a0 to saved stack and return to user space */
+	store_x a0, (7 + portasmADDITIONAL_CONTEXT_SIZE) * portWORD_SIZE(sp)
 	j processed_source
 
 is_exception:
