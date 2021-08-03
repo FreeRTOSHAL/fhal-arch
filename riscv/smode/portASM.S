@@ -136,18 +136,21 @@ handle_synchronous:
 test_if_environment_call:
 	li t0, 8
 	bne a0, t0, is_exception			/* Not an U environment call, so some other exception. */
-	/* handle system calls */
-	li t0, 0
-	beq a7, t0, handle_yield
-	li t0, 1
-	beq a7, t0, handle_enableInterrupt
-	li t0, 2
-	beq a7, t0, handle_disableInterrupt
-	li t0, 3
-	beq a7, t0, handle_putchar
+	
+	/* handle syscall */
 	li t0, 4
-	beq a7, t0, handle_getchar
-	j as_yet_unhandled
+	bgt a7, t0, as_yet_unhandled
+	la t0, 1f
+	slli a7, a7, 2
+	add t0, t0, a7
+	jr t0
+
+1:
+	j handle_yield
+	j handle_enableInterrupt
+	j handle_disableInterrupt
+	j handle_putchar
+	j handle_getchar
 
 handle_enableInterrupt:
 #ifdef CONFIG_ARCH_SBI_TIMER
