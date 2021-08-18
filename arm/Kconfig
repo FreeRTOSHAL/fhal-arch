@@ -63,6 +63,14 @@ config ARCH_SUPPORT_UNWIND_TABLES
 config ARCH_SUPPORT_CUSTOM_TASK_RETURN_ADDRESS
 	bool
 	default y
+config ARCH_ARM_SYSINIT
+	bool
+	default y
+	depends on MACH_NEED_GENERIC_SYSINIT
+	config ARCH_SYSINIT_EARLY_INIT
+		bool
+		default y
+		depends on MACH_NEED_EARLY_INIT
 if ARCH_ARM_CORTEX_M0=y
 source arch/arm/cortex-m0/Kconfig
 endif
