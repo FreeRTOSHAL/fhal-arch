@@ -71,6 +71,10 @@ config ARCH_ARM_SYSINIT
 		bool
 		default y
 		depends on MACH_NEED_EARLY_INIT
+config ARCH_ARM_INIT
+	bool
+	default y
+	depends on MACH_NEED_ARM_INIT
 if ARCH_ARM_CORTEX_M0=y
 source arch/arm/cortex-m0/Kconfig
 endif
