@@ -102,6 +102,10 @@ config ARCH_RISCV_SYSINIT
 	bool
 	default y
 	depends on MACH_NEED_GENERIC_SYSINIT
+	config ARCH_SYSINIT_EARLY_INIT
+		bool
+		default y
+		depends on MACH_NEED_EARLY_INIT
 
 config ARCH_RISCV_HARDWARE_FLOAD
 	bool

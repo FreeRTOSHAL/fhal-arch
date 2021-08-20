@@ -114,6 +114,9 @@ reset_handler:
 
 	// Set Stack Pointer
 	la sp, _end_stack
+#ifdef ARCH_SYSINIT_EARLY_INIT
+	call sysinit_early_init
+#endif
 	
 	// Init Data and BSS
 	call datainit
