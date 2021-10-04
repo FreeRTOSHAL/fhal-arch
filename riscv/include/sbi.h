@@ -324,7 +324,7 @@ struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr, uns
  *
  * SBI_ERR_FAILED
  */
-struct sbiret sbi_hart_stop();
+struct sbiret sbi_hart_stop(void);
 
 /**
  * *Returns* the current status of *hartid* in sbiret.value, or an error through
