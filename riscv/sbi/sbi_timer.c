@@ -6,11 +6,33 @@
 
 
 extern size_t uxTimerIncrementsForOneTick;
-static volatile uint64_t *mtime = (uint64_t *) CONFIG_MACH_MTIME_BASE_ADDRESS;
 static volatile uint64_t next;
 
+/** read 64-bit time */
+static inline uint64_t riscv_rdtime(void)
+{
+#ifdef __LP64__
+        uint64_t n;
+        __asm__ volatile ("rdtime %0" : "=r" (n));
+        return n;
+#else
+        uint32_t u1;
+        uint32_t lo;
+        uint32_t u2;
+        asm volatile (
+                "1:\n"
+                "rdtimeh        %0\n"
+                "rdtime         %1\n"
+                "rdtimeh        %2\n"
+                "bne            %0, %2, 1b\n"
+                : "=&r"(u1), "=&r"(lo), "=&r"(u2));
+        return ((uint64_t)u1 << 32) | lo;
+#endif
+}
+
 void vPortSetupTimerInterrupt() {
-	next = *mtime + uxTimerIncrementsForOneTick;
+	uint64_t mtime = riscv_rdtime();
+	next = mtime + uxTimerIncrementsForOneTick;
 	set_csr(sie, 0x20); /* enable timer interrupt */
 	sbi_set_timer(next);
 }
