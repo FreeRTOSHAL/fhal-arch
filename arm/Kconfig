@@ -75,6 +75,12 @@ config ARCH_ARM_INIT
 	bool
 	default y
 	depends on MACH_NEED_ARM_INIT
+config ARCH_ARM_DIFFRENT_SYSTICK_CLOCK
+	bool "Systick has a diffrent clock as the CPU CLock"
+	default n
+	config ARCH_ARM_SYSTICK_CLOCK_HZ
+		int "Systick Clock HZ"
+		depends on ARCH_ARM_DIFFRENT_SYSTICK_CLOCK
 if ARCH_ARM_CORTEX_M0=y
 source arch/arm/cortex-m0/Kconfig
 endif
